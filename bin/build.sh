@@ -1,3 +1,4 @@
+INSTALL_DEPENDENCIES=1
 BUILD_DSA=1
 BUILD_LLVM=0
 
@@ -104,7 +105,7 @@ linux-opensuse*)
   ;;
 
 linux-ubuntu-14*)
-  DEPENDENCIES+=" clang-3.6 llvm-3.6 libz-dev libedit-dev"
+  DEPENDENCIES+=" clang-3.7 llvm-3.7 libz-dev libedit-dev"
   ;;
 
 linux-ubuntu-12*)
@@ -159,15 +160,15 @@ then
 
   linux-ubuntu-14*)
     # Adding LLVM repository
-    sudo add-apt-repository "deb http://llvm-apt.ecranbleu.org/apt/trusty/ llvm-toolchain-trusty-3.6 main"
+    sudo add-apt-repository "deb http://llvm-apt.ecranbleu.org/apt/trusty/ llvm-toolchain-trusty-3.7 main"
     ${WGET} -O - http://llvm-apt.ecranbleu.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
     sudo apt-get update
     sudo apt-get install -y ${DEPENDENCIES}
-    sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.6 20
-    sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.6 20
-    sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-3.6 20
-    sudo update-alternatives --install /usr/bin/llvm-link llvm-link /usr/bin/llvm-link-3.6 20
-    sudo update-alternatives --install /usr/bin/llvm-dis llvm-dis /usr/bin/llvm-dis-3.6 20
+    sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.7 20
+    sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.7 20
+    sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-3.7 20
+    sudo update-alternatives --install /usr/bin/llvm-link llvm-link /usr/bin/llvm-link-3.7 20
+    sudo update-alternatives --install /usr/bin/llvm-dis llvm-dis /usr/bin/llvm-dis-3.7 20
     ;;
 
   linux-ubuntu-12*)

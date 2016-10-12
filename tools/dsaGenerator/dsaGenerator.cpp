@@ -4,7 +4,7 @@
 //
 
 #include "llvm/LinkAllPasses.h"
-#include "llvm/PassManager.h"
+#include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IRReader/IRReader.h"
@@ -69,9 +69,8 @@ int main(int argc, char **argv) {
   llvm::PassRegistry &Registry = *llvm::PassRegistry::getPassRegistry();
   llvm::initializeAnalysis(Registry);
 
-  llvm::PassManager pass_manager;
+  llvm::legacy::PassManager pass_manager;
 
-  pass_manager.add(new llvm::DataLayoutPass());
   pass_manager.add(new dsa::DSAGenerator());
    
   pass_manager.run(*module.get());
