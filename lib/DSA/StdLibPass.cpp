@@ -566,7 +566,7 @@ StdLibDataStructures::runOnModule (Module &M) {
   for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I) 
     if (I->isDeclaration() && I->doesNotAccessMemory() &&
         !isa<PointerType>(I->getReturnType()))
-      eraseCallsTo(I);
+      eraseCallsTo(&*I);
 
   //
   // Erase direct calls to external functions that are not varargs, do not
@@ -584,7 +584,7 @@ StdLibDataStructures::runOnModule (Module &M) {
           break;
         }
       if (!hasPtr)
-        eraseCallsTo(I);
+        eraseCallsTo(&*I);
     }
 
   if(!DisableStdLib) {
@@ -665,7 +665,7 @@ StdLibDataStructures::runOnModule (Module &M) {
   DEBUG(GlobalsGraph->AssertGraphOK());
   for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
     if (!I->isDeclaration()) {
-      DSGraph *Graph = getOrCreateGraph(I);
+      DSGraph *Graph = getOrCreateGraph(&*I);
       Graph->maskIncompleteMarkers();
       cloneGlobalsInto(Graph, DSGraph::DontCloneCallNodes |
                        DSGraph::DontCloneAuxCallNodes);

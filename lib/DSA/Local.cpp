@@ -168,7 +168,7 @@ namespace {
           if (!f.hasInternalLinkage() || !f.hasPrivateLinkage())
             Node->setExternalMarker();
 #else
-          getValueDest(I).getNode();
+          getValueDest(&*I).getNode();
 #endif
 
         }
@@ -1501,11 +1501,11 @@ void handleMagicSections(DSGraph* GlobalsGraph, Module& M) {
       for (Module::iterator MI = M.begin(), ME = M.end();
            MI != ME; ++MI)
         if (MI->hasSection() && MI->getSection() == section)
-          inSection.insert(MI);
+          inSection.insert(&*MI);
       for (Module::global_iterator MI = M.global_begin(), ME = M.global_end();
            MI != ME; ++MI)
         if (MI->hasSection() && MI->getSection() == section)
-          inSection.insert(MI);
+          inSection.insert(&*MI);
 
       for (unsigned x = 0; x < count; ++x) {
         std::string global;
@@ -1544,14 +1544,14 @@ bool LocalDataStructures::runOnModule(Module &M) {
          I != E; ++I)
       if (!(I->hasSection() && std::string(I->getSection()) == "llvm.metadata")) {
         if (I->isDeclaration())
-          GGB.mergeExternalGlobal(I);
+          GGB.mergeExternalGlobal(&*I);
         else
-          GGB.mergeInGlobalInitializer(I);
+          GGB.mergeInGlobalInitializer(&*I);
       }
     // Add Functions to the globals graph.
     for (Module::iterator FI = M.begin(), FE = M.end(); FI != FE; ++FI){
-      if(addrAnalysis->hasAddressTaken(FI)) {
-        GGB.mergeFunction(FI);
+      if(addrAnalysis->hasAddressTaken(&*FI)) {
+        GGB.mergeFunction(&*FI);
       }
     }
   }
@@ -1577,7 +1577,7 @@ bool LocalDataStructures::runOnModule(Module &M) {
       GraphBuilder GGB(*I, *G, *this);
       G->getAuxFunctionCalls() = G->getFunctionCalls();
       propagateUnknownFlag(G);
-      callgraph.insureEntry(I);
+      callgraph.insureEntry(&*I);
       G->buildCallGraph(callgraph, GlobalFunctionList, true);
       G->maskIncompleteMarkers();
       G->markIncompleteNodes(DSGraph::MarkFormalArgs
@@ -1603,7 +1603,7 @@ bool LocalDataStructures::runOnModule(Module &M) {
   propagateUnknownFlag(GlobalsGraph);
   for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
     if (!I->isDeclaration()) {
-      DSGraph *Graph = getOrCreateGraph(I);
+      DSGraph *Graph = getOrCreateGraph(&*I);
       Graph->maskIncompleteMarkers();
       cloneGlobalsInto(Graph, DSGraph::DontCloneCallNodes |
                        DSGraph::DontCloneAuxCallNodes);
