@@ -174,11 +174,13 @@ public:
   offset_iterator write_offset_end() {return writeOffset.end();}
   const_offset_iterator write_offset_begin() const {return writeOffset.begin();}
   const_offset_iterator write_offset_end() const {return writeOffset.end();}
+  unsigned write_offset_sz() const { return writeOffset.size(); }
 
   offset_iterator read_offset_begin() {return readOffset.begin();}
   offset_iterator read_offset_end() {return readOffset.end();}
   const_offset_iterator read_offset_begin() const {return readOffset.begin();}
   const_offset_iterator read_offset_end() const {return readOffset.end();}
+  unsigned read_offset_sz() const { return readOffset.size(); }
   //===--------------------------------------------------
   // Accessors
 
