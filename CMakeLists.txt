@@ -18,7 +18,7 @@ if (NOT WIN32 OR MSYS OR CYGWIN)
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
 
-  set(LLVM_CXXFLAGS "${LLVM_CXXFLAGS} -fno-exceptions -fno-rtti")
+  set(LLVM_CXXFLAGS "${LLVM_CXXFLAGS} -fexceptions -fno-rtti")
 
   execute_process(
     COMMAND ${LLVM_CONFIG_EXECUTABLE} --libs
