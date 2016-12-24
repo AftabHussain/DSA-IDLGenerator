@@ -7,6 +7,7 @@
 #include "dsa/DSGraph.h"
 #include "dsa/DSNode.h"
 #include "dsa/DataStructure.h"
+#include "llvm/IR/DebugInfo.h"
 #include "llvm/Pass.h"
 
 namespace dsa {
