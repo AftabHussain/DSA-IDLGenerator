@@ -22,7 +22,7 @@ DITypeIdentifierMap TypeIdentifierMap;
 void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
                    offsetNames &of, std::string);
 void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
-                 std::string baseName, std::string indent);
+                 std::string baseName, std::string indent, Argument& arg);
 
 /// Prints it in console. Solely for debugging purposes
 void dumpOffsetNames(offsetNames &of) {
@@ -35,7 +35,7 @@ void dumpOffsetNames(offsetNames &of) {
 }
 
 void printOffsets(DSNode *node, std::string indentation, std::ofstream *file,
-                  std::vector<DSNode *> *visitedNodes, offsetNames &of2) {
+                  std::vector<DSNode *> *visitedNodes, offsetNames &of2, Argument& arg) {
 
   offsetPrinter(*node, *file, "read", of2, indentation);
   offsetPrinter(*node, *file, "write", of2, indentation);
@@ -67,30 +67,35 @@ void printOffsets(DSNode *node, std::string indentation, std::ofstream *file,
       continue;
     }
     DIType *Ty = of2.at(offset).second;
-    errs() << Ty->getTag() << "\n";
+    //errs() << Ty->getTag() << "\n";
     // Previous offset is zero. No continuation
-    getAllNames(Ty, ofInner, 0, offset_name, " ");
+    getAllNames(Ty, ofInner, 0, offset_name, " ", arg);
     dumpOffsetNames(ofInner);
 
-    printOffsets((*ei).second.getNode(), ind2, file, visitedNodes, ofInner);
+    printOffsets((*ei).second.getNode(), ind2, file, visitedNodes, ofInner, arg);
 
     *file << ind2 << "}\n\n";
   }
 }
 
 void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
-                 std::string baseName, std::string indent) {
+                 std::string baseName, std::string indent, Argument& arg) {
   // Handle Pointer type
   if (Ty->getTag() == dwarf::DW_TAG_pointer_type ||
-      Ty->getTag() == dwarf::DW_TAG_member) {
+       Ty->getTag() == dwarf::DW_TAG_member) {
     DIType *baseTy =
         dyn_cast<DIDerivedType>(Ty)->getBaseType().resolve(TypeIdentifierMap);
     if (!baseTy) {
       errs() << "Type : NULL - Nothing more to do\n";
       return;
     }
-
-    // If that pointer is a struct
+    
+    //Skip all the DINodes with DW_TAG_typedef tag
+    while (baseTy->getTag() == dwarf::DW_TAG_typedef) {
+      baseTy = dyn_cast<DIDerivedType>(baseTy)->getBaseType().resolve(TypeIdentifierMap);
+    }
+    
+    // If that pointer is a struct 
     if (baseTy->getTag() == dwarf::DW_TAG_structure_type) {
       DICompositeType *compType = dyn_cast<DICompositeType>(baseTy);
 
@@ -105,20 +110,27 @@ void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
             der->getBaseType().resolve(TypeIdentifierMap)->getTag()) {
           std::string ind2 = indent;
           ind2.append("   ");
+          errs() << der->getName().str();
           getAllNames(dyn_cast<DIType>(der), of, prev_off + offset,
-                      der->getName().str(), ind2);
+                      der->getName().str(), ind2, arg);
         }
         std::string new_name(baseName);
         new_name.append(".");
         new_name.append(der->getName().str());
+        //errs() << "--------------- " << der->getName().str() << "\n";
         of[offset + prev_off] = std::pair<std::string, DIType *>(
             new_name, der->getBaseType().resolve(TypeIdentifierMap));
       }
+    } else if (DIBasicType *bas = dyn_cast<DIBasicType>(baseTy)) {
+      //if type tag for the parameter is of pointer_type and DI type is DIBasicType 
+      //then treat it as a pointer of native type
+      of[0] = std::pair<std::string, DIType *>(
+            arg.getName().str(), bas);
     }
   }
 }
 
-offsetNames getArgFieldNames(Function &F, unsigned argNumber) {
+offsetNames getArgFieldNames(Function &F, unsigned argNumber, Argument& arg) {
   offsetNames offNames;
   assert((argNumber == 0) &&
          "Request for return type information. Not supported");
@@ -131,7 +143,6 @@ offsetNames getArgFieldNames(Function &F, unsigned argNumber) {
          << "\n";
   SmallVector<std::pair<unsigned, MDNode *>, 4> MDs;
   F.getAllMetadata(MDs);
-
   for (auto &MD : MDs) {
     if (MDNode *N = MD.second) {
       if (auto *subRoutine = dyn_cast<DISubprogram>(N)->getType()) {
@@ -143,7 +154,7 @@ offsetNames getArgFieldNames(Function &F, unsigned argNumber) {
           // Resolve the type
           DIType *Ty = ArgTypeRef.resolve(TypeIdentifierMap);
           // Handle Pointer type
-          getAllNames(Ty, offNames, 0, "", "  ");
+          getAllNames(Ty, offNames, 0, "", "  ", arg);
         }
       }
     }
@@ -191,6 +202,7 @@ bool DSAGenerator::runOnModule(Module &m) {
       std::vector<DSNode *> argumentNodes;
       std::ofstream file(F.getName());
 
+      //errs() << "has metadata: " << F.hasMetadata() << "\n";
       for (auto &arg : F.args()) {
         if (arg.hasName()) {
           file << arg.getArgNo() << " = arg -->" << arg.getName().str() << "\n";
@@ -198,7 +210,7 @@ bool DSAGenerator::runOnModule(Module &m) {
 
         // XXX: What about non-pointer variables ??
         if (arg.getType()->isPointerTy()) {
-          offsetNames of = getArgFieldNames(F, arg.getArgNo() + 1);
+          offsetNames of = getArgFieldNames(F, arg.getArgNo() + 1, arg);
           dumpOffsetNames(of);
           DSNodeHandle &nodeHandle = graph->getNodeForValue(&arg);
           DSNode *node = nodeHandle.getNode();
@@ -206,7 +218,7 @@ bool DSAGenerator::runOnModule(Module &m) {
           std::vector<DSNode *> visitedNodes;
 
           visitedNodes.push_back(node);
-          printOffsets(node, "", &file, &visitedNodes, of);
+          printOffsets(node, "", &file, &visitedNodes, of, arg);
         }
         file << "\n";
       }
