@@ -150,7 +150,19 @@ offsetNames getArgFieldNames(Function &F, unsigned argNumber, Argument& arg) {
           errs() << "return type \"void\" for Function : " << F.getName().str()
                  << "\n";
         }
-        if (DITypeRef ArgTypeRef = subRoutine->getTypeArray()[argNumber]) {
+
+        const auto &TypeRef = subRoutine->getTypeArray();
+
+        /// XXX: When function arguments are coerced in IR, the corresponding
+        /// debugInfo extracted for that function from the source code will
+        /// not have the same number of arguments. Check the indexes to
+        /// prevent array out of bounds exception (segfault)
+        if (argNumber >= TypeRef.size()) {
+          errs() << "TypeArray request out of bounds. Are parameters coerced??\n";
+          goto done;
+        }
+
+        if (const auto &ArgTypeRef = TypeRef[argNumber]) {
           // Resolve the type
           DIType *Ty = ArgTypeRef.resolve(TypeIdentifierMap);
           // Handle Pointer type
@@ -159,6 +171,7 @@ offsetNames getArgFieldNames(Function &F, unsigned argNumber, Argument& arg) {
       }
     }
   }
+done:
   return offNames;
 }
 
