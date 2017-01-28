@@ -91,9 +91,12 @@ void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
     }
     
     //Skip all the DINodes with DW_TAG_typedef tag
-    while (baseTy->getTag() == dwarf::DW_TAG_typedef) {
-      baseTy = dyn_cast<DIDerivedType>(baseTy)->getBaseType().resolve(TypeIdentifierMap);
-    }
+    while (baseTy->getTag() == dwarf::DW_TAG_typedef || baseTy->getTag() == dwarf::DW_TAG_const_type) {
+      if(DITypeRef temp = dyn_cast<DIDerivedType>(baseTy)->getBaseType())
+         baseTy = temp.resolve(TypeIdentifierMap);
+      else
+         break;
+    }  
     
     // If that pointer is a struct 
     if (baseTy->getTag() == dwarf::DW_TAG_structure_type) {
