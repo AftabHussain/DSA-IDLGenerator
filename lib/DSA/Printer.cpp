@@ -111,6 +111,7 @@ static std::string getCaption(const DSNode *N, const DSGraph *G) {
         OS << *it << " ";
       }
     }
+    OS << " size: " << N->getSize() << " ";
     OS << "\n";
   }
 

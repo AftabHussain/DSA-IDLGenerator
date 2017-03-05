@@ -10,6 +10,7 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/ValueSymbolTable.h"
 #include "llvm/Support/Debug.h"
+#include "llvm/Support/FileSystem.h"
 
 #include <fstream>
 
@@ -62,6 +63,8 @@ void printOffsets(DSNode *node, std::string indentation, std::ofstream *file,
       *file << "\n" << ind2 << "{\n";
       *file << ind2 << "offset: " << offset << " | name: " << offset_name
             << "\n";
+      *file << "collapsed: " << (*ei).second.getNode()->isCollapsedNode() << "\n"; 
+      *file << "forward: " << (*ei).second.getNode()->isForwarding() << "\n"; 
     } catch (std::out_of_range &e) {
       errs() << "OUT of range exception " << e.what() << "\n";
       continue;
@@ -80,6 +83,7 @@ void printOffsets(DSNode *node, std::string indentation, std::ofstream *file,
 
 void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
                  std::string baseName, std::string indent, Argument& arg) {
+  //if(prev_off >= 1024) return;
   // Handle Pointer type
   if (Ty->getTag() == dwarf::DW_TAG_pointer_type ||
        Ty->getTag() == dwarf::DW_TAG_member) {
@@ -91,7 +95,7 @@ void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
     }
     
     //Skip all the DINodes with DW_TAG_typedef tag
-    while (baseTy->getTag() == dwarf::DW_TAG_typedef || baseTy->getTag() == dwarf::DW_TAG_const_type) {
+    while (baseTy->getTag() == dwarf::DW_TAG_typedef || baseTy->getTag() == dwarf::DW_TAG_const_type || baseTy->getTag() == dwarf::DW_TAG_pointer_type) {
       if(DITypeRef temp = dyn_cast<DIDerivedType>(baseTy)->getBaseType())
          baseTy = temp.resolve(TypeIdentifierMap);
       else
@@ -106,20 +110,37 @@ void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
       for (DINode *Op : compType->getElements()) {
         DIDerivedType *der = dyn_cast<DIDerivedType>(Op);
         unsigned offset = der->getOffsetInBits() >> 3;
-
-        /// XXX: crude assumption that we want to peek only into those members
-        /// whose sizes are greater than 8 bytes
-        if (((der->getSizeInBits() >> 3) > 8) &&
-            der->getBaseType().resolve(TypeIdentifierMap)->getTag()) {
-          std::string ind2 = indent;
-          ind2.append("   ");
-          errs() << der->getName().str();
-          getAllNames(dyn_cast<DIType>(der), of, prev_off + offset,
-                      der->getName().str(), ind2, arg);
-        }
+        //errs() << "ty = "; baseTy->dump(); errs() << "\nthis guy = \n"; //dyn_cast<DIDerivedType>(der->getBaseType().resolve(TypeIdentifierMap))->getBaseType().resolve(TypeIdentifierMap)->getRef(); errs()  << "\n";
+        //der->getBaseType().resolve(TypeIdentifierMap)->dump(); //errs() << "\n";
+        //errs() << der->getBaseType().resolve(TypeIdentifierMap)->getRef(); errs() << "\n";
+        //if (der->getBaseType().resolve(TypeIdentifierMap)->getTag() == dwarf::DW_TAG_pointer_type) 
+        //(dyn_cast<DIDerivedType>(der->getBaseType().resolve(TypeIdentifierMap))->getBaseType().resolve(TypeIdentifierMap)->dump()); errs() << "\n";
+        //errs() << "teg: " << der->getBaseType().resolve(TypeIdentifierMap)->getTag() << "\n\n";
+          DIType *derCopy;
+        /*if (der->getBaseType().resolve(TypeIdentifierMap)->getTag() == dwarf::DW_TAG_pointer_type) {
+          derCopy = der->getBaseType().resolve(TypeIdentifierMap);
+          while (derCopy->getTag() == dwarf::DW_TAG_typedef || derCopy->getTag() == dwarf::DW_TAG_const_type || derCopy->getTag() == dwarf::DW_TAG_pointer_type) {
+            if(DITypeRef temp = dyn_cast<DIDerivedType>(derCopy)->getBaseType())
+              derCopy = temp.resolve(TypeIdentifierMap);
+            else
+              break;
+          }
+        }*/
         std::string new_name(baseName);
         new_name.append(".");
         new_name.append(der->getName().str());
+        /// XXX: crude assumption that we want to peek only into those members
+        /// whose sizes are greater than 8 bytes
+        if (((der->getSizeInBits() >> 3) > 8) 
+           && der->getBaseType().resolve(TypeIdentifierMap)->getTag()) {
+           //|| (der->getBaseType().resolve(TypeIdentifierMap)->getTag() == dwarf::DW_TAG_pointer_type  &&
+           //baseTy->getRef() != derCopy->getRef())) {
+          //errs() << der->getName().str() << "\n";
+          //std::string ind2 = indent;
+          //ind2.append("   ");
+          getAllNames(dyn_cast<DIType>(der), of, prev_off + offset,
+                      new_name, indent, arg);
+        }
         //errs() << "--------------- " << der->getName().str() << "\n";
         of[offset + prev_off] = std::pair<std::string, DIType *>(
             new_name, der->getBaseType().resolve(TypeIdentifierMap));
@@ -181,16 +202,19 @@ done:
 void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
                    offsetNames &of, std::string indent) {
   DSNode::const_offset_iterator ii, ei;
+  //int sz, i=0;
   if (op.str() == "read") {
     file << "\n" << indent << "Read: \n";
     ii = node.read_offset_begin();
     ei = node.read_offset_end();
+    //sz = node.read_offset_sz();
   } else if (op.str() == "write") {
     file << "\n" << indent << "Write: \n";
     ii = node.write_offset_begin();
     ei = node.write_offset_end();
+    //sz = node.write_offset_sz();
   }
-
+  //errs() << "size: " << sz << "\n";
   for (; ii != ei; ii++) {
     unsigned offset = *ii;
     std::string Name("????");
@@ -206,14 +230,17 @@ bool DSAGenerator::runOnModule(Module &m) {
   if (NamedMDNode *CU_Nodes = m.getNamedMetadata("llvm.dbg.cu")) {
     TypeIdentifierMap = generateDITypeIdentifierMap(CU_Nodes);
   }
-
+  std::error_code EC;
+  StringRef b("bu");
+  llvm::raw_fd_ostream F1(b, EC, sys::fs::OpenFlags::F_None);
+  //std::ofstream F1("bu");
+  //BU->print(F1, &m);
   for (auto &F : m) {
     if (F.getName().find("llvm") == std::string::npos) {
       if (F.isDeclaration()) {
         errs() << F.getName() << " just function declaration, skipping \n";
         continue;
       }
-
       DSGraph *graph = BU->getDSGraph(F);
       std::vector<DSNode *> argumentNodes;
       std::ofstream file(F.getName());
@@ -230,7 +257,8 @@ bool DSAGenerator::runOnModule(Module &m) {
           dumpOffsetNames(of);
           DSNodeHandle &nodeHandle = graph->getNodeForValue(&arg);
           DSNode *node = nodeHandle.getNode();
-
+          file << "collapsed: " << node->isCollapsedNode() << "\n";
+          file << "forward: " << node->isForwarding() << "\n";
           std::vector<DSNode *> visitedNodes;
 
           visitedNodes.push_back(node);
