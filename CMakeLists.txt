@@ -62,7 +62,9 @@ include_directories(include)
 
 add_library(DSAGenerator STATIC
   include/dsaGenerator/DSAGenerator.h
+  include/dsaGenerator/UndefinedFunctionsPass.h
   lib/dsaGenerator/DSAGenerator.cpp
+  lib/dsaGenerator/UndefinedFunctionsPass.cpp
 )
 
 add_library(dsa STATIC
