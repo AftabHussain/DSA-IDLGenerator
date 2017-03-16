@@ -20,6 +20,7 @@
 #include "llvm/Support/FormattedStream.h"
 
 #include "dsaGenerator/DSAGenerator.h"
+#include "dsaGenerator/UndefinedFunctionsPass.h"
 
 #define DEBUG_TYPE "dsa"
 
@@ -30,6 +31,10 @@ InputFilename(llvm::cl::Positional, llvm::cl::desc("<input LLVM bitcode file>"),
 static llvm::cl::opt<std::string>
 DefaultDataLayout("default-data-layout", llvm::cl::desc("data layout string to use if not specified by module"),
   llvm::cl::init(""), llvm::cl::value_desc("layout-string"));
+
+static llvm::cl::opt<std::string>
+FunctionsList("functionsList", llvm::cl::desc("File name with function name list"),
+  llvm::cl::init(""), llvm::cl::value_desc("filename"));
 
 namespace {
   using namespace llvm;
@@ -71,7 +76,8 @@ int main(int argc, char **argv) {
 
   llvm::legacy::PassManager pass_manager;
 
-  pass_manager.add(new dsa::DSAGenerator());
+  pass_manager.add(new dsa::DSAGenerator(FunctionsList));
+  //pass_manager.add(new dsa::UndefinedFunctionsPass(FunctionsList));
    
   pass_manager.run(*module.get());
 

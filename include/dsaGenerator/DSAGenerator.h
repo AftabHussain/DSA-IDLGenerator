@@ -12,24 +12,24 @@
 
 namespace dsa {
 
-using namespace llvm;
-
 class DSAGenerator : public llvm::ModulePass {
 private:
-  BUDataStructures *BU;
+  llvm::BUDataStructures *BU;
+  std::string passName;
+  std::string functionsList;
 
 public:
   static char ID; // Pass identification, replacement for typeid
-  std::string passName;
 
-  DSAGenerator() : llvm::ModulePass(ID), BU(NULL), passName("DSAGenerator") {}
+  DSAGenerator(std::string functionsList) : llvm::ModulePass(ID), BU(NULL), passName("DSAGenerator"), functionsList(functionsList) {}
 
   virtual const char *getPassName() const { return passName.c_str(); }
+  std::string getFunctionsList() {return functionsList;}
 
   virtual bool runOnModule(llvm::Module &m);
 
-  virtual void getAnalysisUsage(AnalysisUsage &AU) const {
-    AU.addRequired<BUDataStructures>();
+  virtual void getAnalysisUsage(llvm::AnalysisUsage &AU) const {
+    AU.addRequired<llvm::BUDataStructures>();
     AU.setPreservesAll();
   }
 };
