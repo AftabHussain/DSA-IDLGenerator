@@ -24,7 +24,7 @@ using namespace llvm;
 typedef std::map<unsigned, std::pair<std::string, DIType *>> offsetNames;
 DITypeIdentifierMap TypeIdentifierMap;
 void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
-                   offsetNames &of, std::string);
+                   offsetNames &of, std::string, std::string);
 void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
                  std::string baseName, std::string indent, Argument& arg, std::string&);
 
@@ -56,8 +56,8 @@ void printOffsets(DSNode *node, std::string indentation, std::ofstream *file,
         argType = dyn_cast<PointerType>(argType)->getElementType();
       }
       *file << indentation << "\nprojection <struct " << dyn_cast<StructType>(argType)->getName().substr(7).str() << "> " << functionName << "." << arg.getName().str() << " {\n";
-      offsetPrinter(*node, *file, "read", of2, indentation);
-      offsetPrinter(*node, *file, "write", of2, indentation);
+      offsetPrinter(*node, *file, "read", of2, functionName, indentation);
+      offsetPrinter(*node, *file, "write", of2, functionName, indentation);
       *file << indentation << "}\n\n";
   } 
   //else
@@ -102,27 +102,37 @@ void printOffsets(DSNode *node, std::string indentation, std::ofstream *file,
   }
 }
 
-void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
-                 std::string baseName, std::string indent, Argument& arg, std::string& structName) {
-  //if(prev_off >= 1024) return;
-  // Handle Pointer type
+DIType* getLowestDINode(DIType* Ty) {
   if (Ty->getTag() == dwarf::DW_TAG_pointer_type ||
        Ty->getTag() == dwarf::DW_TAG_member) {
     DIType *baseTy =
         dyn_cast<DIDerivedType>(Ty)->getBaseType().resolve(TypeIdentifierMap);
     if (!baseTy) {
       errs() << "Type : NULL - Nothing more to do\n";
-      return;
+      return NULL;
     }
     
     //Skip all the DINodes with DW_TAG_typedef tag
-    while (baseTy->getTag() == dwarf::DW_TAG_typedef || baseTy->getTag() == dwarf::DW_TAG_const_type || baseTy->getTag() == dwarf::DW_TAG_pointer_type) {
-      if(DITypeRef temp = dyn_cast<DIDerivedType>(baseTy)->getBaseType())
-         baseTy = temp.resolve(TypeIdentifierMap);
+    while ((baseTy->getTag() == dwarf::DW_TAG_typedef || baseTy->getTag() == dwarf::DW_TAG_const_type 
+           || baseTy->getTag() == dwarf::DW_TAG_pointer_type)) {
+      if (DITypeRef temp = dyn_cast<DIDerivedType>(baseTy)->getBaseType())
+        baseTy = temp.resolve(TypeIdentifierMap);
       else
-         break;
+        break;
     }  
-    
+    return baseTy;
+  }
+  return Ty;
+}
+
+void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
+                 std::string baseName, std::string indent, Argument& arg, std::string& structName) {
+  //if(prev_off >= 1024) return;
+  // Handle Pointer type
+
+    DIType* baseTy = getLowestDINode(Ty);
+    if (!baseTy)
+      return;
     // If that pointer is a struct 
     if (baseTy->getTag() == dwarf::DW_TAG_structure_type) {
       //*file << "projection <struct " << arg->getType()->getStructName().str() << "" ;
@@ -136,6 +146,8 @@ void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
         std::string new_name(baseName);
         new_name.append(".");
         new_name.append(der->getName().str());
+        of[offset + prev_off] = std::pair<std::string, DIType *>(
+            new_name, der->getBaseType().resolve(TypeIdentifierMap));
         /// XXX: crude assumption that we want to peek only into those members
         /// whose sizes are greater than 8 bytes
         if (((der->getSizeInBits() >> 3) > 8) 
@@ -145,8 +157,6 @@ void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
                       new_name, indent, arg, tempStructName);
         }
         //errs() << "--------------- " << der->getName().str() << "\n";
-        of[offset + prev_off] = std::pair<std::string, DIType *>(
-            new_name, der->getBaseType().resolve(TypeIdentifierMap));
       }
     } else if (DIBasicType *bas = dyn_cast<DIBasicType>(baseTy)) {
       structName = "";
@@ -157,7 +167,7 @@ void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
     } else {
       structName = "";
     }
-  }
+  //}
 }
 
 offsetNames getArgFieldNames(Function &F, unsigned argNumber, Argument& arg, std::string& structName) {
@@ -205,17 +215,77 @@ done:
   return offNames;
 }
 
+std::string getTypeNameFromDINode(DIType* dt) {
+  while(dt->getName().str() == "") {
+    dt = dyn_cast<DIDerivedType>(dt)->getBaseType().resolve(TypeIdentifierMap);
+  }
+  return dt->getName().str();
+}
+
+std::string getTypeName(DIType* dt, std::string function, std::string fieldName) {
+  if (DIBasicType* bt = dyn_cast<DIBasicType>(dt)) {
+    return bt->getName().str() + " " + fieldName;
+  } else if (DICompositeType* ct = dyn_cast<DICompositeType>(dt)) {
+    if (ct->getTag() == dwarf::DW_TAG_union_type) {
+      return "union " + fieldName;
+    } else {
+      return "projection " + function + "." + ct->getName().str() + " *" + fieldName;
+    }
+  } else if (DISubroutineType* sr = dyn_cast<DISubroutineType>(dt)) {
+    //if (!sr->getType()) {
+      //return "rpc function " + "(*" + fieldName + ")()";  
+    //} else {
+      std::string name("rpc ");
+      const DITypeRefArray &types = sr->getTypeArray();
+      if (!types[0]) {
+        //return type void
+        name += "void (*" + fieldName + ") (";
+      } else {
+        DIType *ty = types[0].resolve(TypeIdentifierMap);
+        //DIType *baseTy = getLowestDINode(ty);
+         
+        name += getTypeNameFromDINode(ty) + " (*" + fieldName + ") (";
+      }
+      unsigned int paramIndex = 1;
+      while (paramIndex < types.size()) {
+        DIType *ty = types[paramIndex].resolve(TypeIdentifierMap);
+        ty->dump();
+        //name += getTypeNameFromDINode(ty) + ", ";
+        name += getTypeName(ty, function, "") + ", ";
+        paramIndex++;
+      }
+      name += ");";
+      return name;
+    //}
+  } else {
+    if (DITypeRef temp = dyn_cast<DIDerivedType>(dt)->getBaseType()) {
+      DIType *baseTy = temp.resolve(TypeIdentifierMap);
+      return getTypeName(baseTy, function, fieldName);
+    }
+    /*DIType *baseTy =
+        dyn_cast<DIDerivedType>(dt)->getBaseType().resolve(TypeIdentifierMap);
+    while ((baseTy->getTag() == dwarf::DW_TAG_typedef || baseTy->getTag() == dwarf::DW_TAG_const_type 
+           || baseTy->getTag() == dwarf::DW_TAG_pointer_type || baseTy->getTag() == dwarf::DW_TAG_union_type)) {
+      if (DITypeRef temp = dyn_cast<DIDerivedType>(baseTy)->getBaseType())
+        baseTy = temp.resolve(TypeIdentifierMap);
+      else
+        break;
+    }
+    return baseTy->getName().str();*/
+  }
+}
+
 void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
-                   offsetNames &of, std::string indent) {
+                   offsetNames &of, std::string functionName, std::string indent) {
   DSNode::const_offset_iterator ii, ei;
   //int sz, i=0;
   if (op.str() == "read") {
-    //file << "\n" << indent << "Read: \n";
+    file << "\n" << indent << "Read: \n";
     ii = node.read_offset_begin();
     ei = node.read_offset_end();
     //sz = node.read_offset_sz();
   } else if (op.str() == "write") {
-    //file << "\n" << indent << "Write: \n";
+    file << "\n" << indent << "Write: \n";
     ii = node.write_offset_begin();
     ei = node.write_offset_end();
     //sz = node.write_offset_sz();
@@ -227,7 +297,9 @@ void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
     if (of.find(offset) != of.end()) {
       Name = of.at(offset).first;
     }
-    file << indent << " offset: " << *ii << "\t\t" << Name << "\n";
+    errs() << indent << " offset: " << *ii << "\t\t" << Name << "\n";
+    of.at(offset).second->dump();
+    file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
   }
 }
 
@@ -290,3 +362,11 @@ bool DSAGenerator::runOnModule(Module &m) {
 // Pass ID variable
 char DSAGenerator::ID = 0;
 }
+//
+// This file is distributed under the MIT License. See LICENSE for details.
+//
+#include "dsaGenerator/DSAGenerator.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/InstIterator.h"
+#include "llvm/IR/Instructions.h"
