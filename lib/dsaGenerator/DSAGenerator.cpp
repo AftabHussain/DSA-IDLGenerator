@@ -323,6 +323,7 @@ bool DSAGenerator::runOnModule(Module &m) {
 	//BU->print(F1, &m);
 	std::ofstream file(m.getName().str() + ".idl");
 	std::ofstream undefinedFunctionsFile(m.getName().str() + "_undefined_functions.txt");
+	std::ofstream definedFunctionsFile(m.getName().str() + "_defined_functions.txt");
 	std::string functionsListFile = getFunctionsList();
 	std::unordered_set<std::string> functions;
 
@@ -344,6 +345,10 @@ bool DSAGenerator::runOnModule(Module &m) {
 			if (F.isDeclaration()) {
 				undefinedFunctionsFile << F.getName().str() << "\n";
 				continue;
+			}
+			else {
+			errs() << "a defined function";
+				definedFunctionsFile << F.getName().str() << "\n";
 			}
 			DSGraph *graph = BU->getDSGraph(F);
 			std::vector<DSNode *> argumentNodes;
