@@ -325,15 +325,22 @@ bool DSAGenerator::runOnModule(Module &m) {
 	std::ofstream undefinedFunctionsFile(m.getName().str() + "_undefined_functions.txt");
 	std::string functionsListFile = getFunctionsList();
 	std::unordered_set<std::string> functions;
+
+	//functionsListFile is empty, the following is not invoked.
 	if(!functionsListFile.empty()) {
 		std::ifstream functionFile(functionsListFile);
 		std::copy(std::istream_iterator<std::string>(functionFile),
 				std::istream_iterator<std::string>(),
 				std::inserter(functions, functions.begin()));
 	}
+
+	// scans through all caller callee functions.
 	for (auto &F : m) {
+		//ignore functions like llvm.debug.declare
 		if (F.getName().find("llvm") == std::string::npos 
 				&& (functions.empty() || functions.find(F.getName()) != functions.end())) {
+
+			//Return true if the primary definition of this global value is outside of the current translation unit.
 			if (F.isDeclaration()) {
 				undefinedFunctionsFile << F.getName().str() << "\n";
 				continue;
