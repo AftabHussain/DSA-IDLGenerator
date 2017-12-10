@@ -309,11 +309,15 @@ void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
 }
 
 bool DSAGenerator::runOnModule(Module &m) {
+	//https://github.com/llvm-mirror/poolalloc/blob/master/include/dsa/DataStructure.h#L222
 	BU = &getAnalysis<BUDataStructures>();
         std::error_code EC;
-  llvm::raw_fd_ostream F("bu", EC, sys::fs::OpenFlags::F_None);
+  	llvm::raw_fd_ostream F("bu", EC, sys::fs::OpenFlags::F_None);
         BU->print(F, &m);
 	if (NamedMDNode *CU_Nodes = m.getNamedMetadata("llvm.dbg.cu")) {
+		//include/llvm/IR/DebugInfo.h:37:typedef DenseMap<const MDString *, DIType *> DITypeIdentifierMap;
+		//MDString is a A single uniqued string. These are used to efficiently contain a byte sequence for metadata. 
+		//DIType (DebugInfo Type) - the base class for types.  
 		TypeIdentifierMap = generateDITypeIdentifierMap(CU_Nodes);
 	}
 	//std::error_code EC;
@@ -347,7 +351,7 @@ bool DSAGenerator::runOnModule(Module &m) {
 				continue;
 			}
 			else {
-			errs() << "a defined function";
+			errs() << "a defined function{"<< F.getName().str()<<"}\n";
 				definedFunctionsFile << F.getName().str() << "\n";
 			}
 			DSGraph *graph = BU->getDSGraph(F);
