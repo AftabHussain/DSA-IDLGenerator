@@ -176,9 +176,15 @@ namespace dsa {
 }
 
 offsetNames getArgFieldNames(Function &F, unsigned argNumber, StringRef argName, std::string& structName) {
+
+	errs() << "F.getName(){"<<F.getName()<<"}\n";
+	//errs() << "number of arguments";
 	offsetNames offNames;
-	assert((argNumber == 0) &&
-			"Request for return type information. Not supported");
+
+	//it should be assert((argNumber != 0)....
+	//assert((argNumber == 0) && "Request for return type information. Not supported");
+	
+	//didn't find any such case
 	if (argNumber > F.arg_size()) {
 		errs() << "### WARN : requested data for non-existent element\n";
 		return offNames;
@@ -186,6 +192,7 @@ offsetNames getArgFieldNames(Function &F, unsigned argNumber, StringRef argName,
 	errs() << "## Function ## : " << F.getName().str()
 		<< " | argsize: " << F.arg_size() << " :: Requested " << argNumber
 		<< "\n";
+	//GGL smallvector llvm
 	SmallVector<std::pair<unsigned, MDNode *>, 4> MDs;
 	F.getAllMetadata(MDs);
 	for (auto &MD : MDs) {
@@ -341,12 +348,17 @@ bool DSAGenerator::runOnModule(Module &m) {
 
 	// scans through all caller callee functions.
 	for (auto &F : m) {
+
+		errs() << "Scanning Function {"<<F.getName().str()<<"}\n";
+
 		//ignore functions like llvm.debug.declare
 		if (F.getName().find("llvm") == std::string::npos 
 				&& (functions.empty() || functions.find(F.getName()) != functions.end())) {
+			//functions is empty
 
 			//Return true if the primary definition of this global value is outside of the current translation unit.
 			if (F.isDeclaration()) {
+			errs() << "an undefined function{"<< F.getName().str()<<"}\n";
 				undefinedFunctionsFile << F.getName().str() << "\n";
 				continue;
 			}
@@ -354,23 +366,39 @@ bool DSAGenerator::runOnModule(Module &m) {
 			errs() << "a defined function{"<< F.getName().str()<<"}\n";
 				definedFunctionsFile << F.getName().str() << "\n";
 			}
+
+			//include/dsa/DSGraph.h +194	
 			DSGraph *graph = BU->getDSGraph(F);
+			
+			//include/dsa/DSNode.h +43
 			std::vector<DSNode *> argumentNodes;
 
 			//errs() << "has metadata: " << F.hasMetadata() << "\n";
+
+			//include/llvm/ADT/iterator_range.h +32 | args is an iterator range
+			//arguments of undefined functions are not available
 			for (auto &arg : F.args()) {
+				errs() << "Scanning argument {" << arg.getName().str() << "}\n";
 				if (arg.hasName()) {
 					errs() << arg.getArgNo() << " = arg -->" << arg.getName().str() << "\n";
 				}
 
+				//did not find the following case to be true
+				else {
+					errs() << "arg does not have a name";
+				}
+
 				// XXX: What about non-pointer variables ??
 				if (arg.getType()->isPointerTy()) {
+
+					//include/dsa/DSSupport.h +54
 					DSNodeHandle &nodeHandle = graph->getNodeForValue(&arg);
 					DSNode *node = nodeHandle.getNode();
                                         errs() << "isglobal: " << node->isGlobalNode() << "-------------------\n";
                                         if (node->isGlobalNode())
 					  continue;
 					std::string structName;
+					errs() << "arg.getArgNo(){"<<arg.getArgNo()<<"}\n";
 					offsetNames of = getArgFieldNames(F, arg.getArgNo() + 1, arg.getName(), structName);
 					dumpOffsetNames(of);
 					//file << "collapsed: " << node->isCollapsedNode() << "\n";
@@ -418,7 +446,6 @@ bool DSAGenerator::runOnModule(Module &m) {
 			//file << "collapsed: " << node->isCollapsedNode() << "\n";
 			//file << "forward: " << node->isForwarding() << "\n";
 			std::vector<DSNode *> visitedNodes;
-
 			visitedNodes.push_back(node);
 			printOffsets(node, "", &file, &visitedNodes, of, var->getType(), globalVariables[i]->getDisplayName(), structName, "bu.global");
                         file << "\n";
