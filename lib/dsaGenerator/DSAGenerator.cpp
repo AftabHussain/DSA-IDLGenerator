@@ -134,6 +134,7 @@ namespace dsa {
 		//if(prev_off >= 1024) return;
 		// Handle Pointer type
 
+		//TODO need to find out exactly why we need the type of the lowest node.
 		DIType* baseTy = getLowestDINode(Ty);
 		if (!baseTy)
 			return;
@@ -175,6 +176,7 @@ namespace dsa {
 		//}
 }
 
+//Gets the field names of a structure
 offsetNames getArgFieldNames(Function &F, unsigned argNumber, StringRef argName, std::string& structName) {
 
 	errs() << "F.getName(){"<<F.getName()<<"}\n";
@@ -199,8 +201,7 @@ offsetNames getArgFieldNames(Function &F, unsigned argNumber, StringRef argName,
 		if (MDNode *N = MD.second) {
 			if (auto *subRoutine = dyn_cast<DISubprogram>(N)->getType()) {
 				if (!subRoutine->getTypeArray()[0]) {
-					errs() << "return type \"void\" for Function : " << F.getName().str()
-						<< "\n";
+					errs() << "return type \"void\" for Function : " << F.getName().str()<< "\n";
 				}
 
 				const auto &TypeRef = subRoutine->getTypeArray();
@@ -209,6 +210,7 @@ offsetNames getArgFieldNames(Function &F, unsigned argNumber, StringRef argName,
 				/// debugInfo extracted for that function from the source code will
 				/// not have the same number of arguments. Check the indexes to
 				/// prevent array out of bounds exception (segfault)
+				//did not encounter this case with dummy.c
 				if (argNumber >= TypeRef.size()) {
 					errs() << "TypeArray request out of bounds. Are parameters coerced??\n";
 					goto done;
@@ -316,8 +318,12 @@ void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
 }
 
 bool DSAGenerator::runOnModule(Module &m) {
-	//https://github.com/llvm-mirror/poolalloc/blob/master/include/dsa/DataStructure.h#L222
+
+	//include/dsaGenerator/DSAGenerator.h +17 //BU Definition
+	//https://github.com/llvm-mirror/poolalloc/blob/master/include/dsa/DataStructure.h line 22
+	//http://llvm.org/doxygen/classllvm_1_1Pass.html#a4863e5e463fb79955269fbf7fbf52b80
 	BU = &getAnalysis<BUDataStructures>();
+
         std::error_code EC;
   	llvm::raw_fd_ostream F("bu", EC, sys::fs::OpenFlags::F_None);
         BU->print(F, &m);
