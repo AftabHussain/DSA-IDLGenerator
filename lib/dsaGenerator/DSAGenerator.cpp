@@ -13,6 +13,9 @@
 #include "llvm/IR/DebugInfo.h"
 #include "llvm/Support/FileSystem.h"
 
+#include <stdio.h>
+#include <string.h>
+
 #include <fstream>
 #include <iterator>
 #include <algorithm>
@@ -353,7 +356,17 @@ bool DSAGenerator::runOnModule(Module &m) {
 	}
 
 	// scans through all caller callee functions.
+	
+	//char funcname[15];
+//	strcpy(funcname, "register_netdevice");
+//	int result;
+
 	for (auto &F : m) {
+		//result = strcmp(F.getName().str,funcname);
+		//if (result==0){
+		//ah46 if (F.getName().str()=="register_netdevice"){	
+// 		errs()<<"Test successful ah\n";
+
 
 		errs() << "Scanning Function {"<<F.getName().str()<<"}\n";
 
@@ -417,6 +430,8 @@ bool DSAGenerator::runOnModule(Module &m) {
 				file << "\n";
 			}
 		}
+	//	}//new if check@ah46
+
 	}
 	//errs() << "global names\n";
 	//errs() << "size: " << m.getGlobalList().size() << "\n";
