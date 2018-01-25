@@ -56,23 +56,27 @@ namespace dsa {
 			//     .str() << "> " << structName << " {";
 			//else
 			Type* argType = elementType;
+
 			while(!isa<StructType>(argType)) {
 				argType = dyn_cast<PointerType>(argType)->getElementType();
 			}
+
 			*file << indentation << "\nprojection <struct " << dyn_cast<StructType>(argType)->getName().substr(7).str() << "> " << functionName << "." << elementName.str() << " {\n";
-                        //*file << (node->isCollapsedNode() ? "collapsed\n" : "not collapsed\n");
+                        
+			//*file << (node->isCollapsedNode() ? "collapsed\n" : "not collapsed\n");
 			offsetPrinter(*node, *file, "read", of2, functionName, indentation);
 			offsetPrinter(*node, *file, "write", of2, functionName, indentation);
 			*file << indentation << "}\n\n";
 		} 
+
 		//else
 		//*file << "\n" << indentation << "{\n";
 
 		visitedNodes->push_back(node);
-		for (DSNode::const_edge_iterator ei = node->edge_begin();
-				ei != node->edge_end(); ei++) {
-			if (std::find(visitedNodes->begin(), visitedNodes->end(),
-						(*ei).second.getNode()) != visitedNodes->end())
+	
+		for (DSNode::const_edge_iterator ei = node->edge_begin();ei != node->edge_end(); ei++) {
+			
+			if (std::find(visitedNodes->begin(), visitedNodes->end(),(*ei).second.getNode()) != visitedNodes->end())
 				continue;
 			offsetNames of3;
 			std::string ind2 = indentation;
@@ -97,6 +101,7 @@ namespace dsa {
                                 errs() << "offset: " << offset << "\n";
 				continue;
 			}
+			
 			DIType *Ty = of2.at(offset).second;
 			//errs() << Ty->getTag() << "\n";
                         structName = "";
@@ -152,8 +157,7 @@ namespace dsa {
 				DIDerivedType *der = dyn_cast<DIDerivedType>(Op);
 				unsigned offset = der->getOffsetInBits() >> 3;
 				std::string new_name(baseName);
-                                if (new_name != "")
-				  new_name.append(".");
+                                if (new_name != "") new_name.append(".");
 				new_name.append(der->getName().str());
 				of[offset + prev_off] = std::pair<std::string, DIType *>(
 						new_name, der->getBaseType().resolve(TypeIdentifierMap));
@@ -179,106 +183,106 @@ namespace dsa {
 		//}
 }
 
-//Gets the field names of a structure
-offsetNames getArgFieldNames(Function &F, unsigned argNumber, StringRef argName, std::string& structName) {
+	//Gets the field names of a structure
+	offsetNames getArgFieldNames(Function &F, unsigned argNumber, StringRef argName, std::string& structName) {
 
-	errs() << "F.getName(){"<<F.getName()<<"}\n";
-	//errs() << "number of arguments";
-	offsetNames offNames;
+		errs() << "F.getName(){"<<F.getName()<<"}\n";
+		//errs() << "number of arguments";
+		offsetNames offNames;
 
-	//it should be assert((argNumber != 0)....
-	//assert((argNumber == 0) && "Request for return type information. Not supported");
+		//it should be assert((argNumber != 0)....
+		//assert((argNumber == 0) && "Request for return type information. Not supported");
 	
-	//didn't find any such case
-	if (argNumber > F.arg_size()) {
-		errs() << "### WARN : requested data for non-existent element\n";
-		return offNames;
-	}
-	errs() << "## Function ## : " << F.getName().str()
+		//didn't find any such case
+		if (argNumber > F.arg_size()) {
+			errs() << "### WARN : requested data for non-existent element\n";
+			return offNames;
+		}
+		errs() << "## Function ## : " << F.getName().str()
 		<< " | argsize: " << F.arg_size() << " :: Requested " << argNumber
 		<< "\n";
-	//GGL smallvector llvm
-	SmallVector<std::pair<unsigned, MDNode *>, 4> MDs;
-	F.getAllMetadata(MDs);
-	for (auto &MD : MDs) {
-		if (MDNode *N = MD.second) {
-			if (auto *subRoutine = dyn_cast<DISubprogram>(N)->getType()) {
-				if (!subRoutine->getTypeArray()[0]) {
-					errs() << "return type \"void\" for Function : " << F.getName().str()<< "\n";
+		//GGL smallvector llvm
+		SmallVector<std::pair<unsigned, MDNode *>, 4> MDs;
+		F.getAllMetadata(MDs);
+		for (auto &MD : MDs) {
+			if (MDNode *N = MD.second) {
+				if (auto *subRoutine = dyn_cast<DISubprogram>(N)->getType()) {
+					if (!subRoutine->getTypeArray()[0]) {
+						errs() << "return type \"void\" for Function : " << F.getName().str()<< "\n";
+					}
+
+					const auto &TypeRef = subRoutine->getTypeArray();
+
+					/// XXX: When function arguments are coerced in IR, the corresponding
+					/// debugInfo extracted for that function from the source code will
+					/// not have the same number of arguments. Check the indexes to
+					/// prevent array out of bounds exception (segfault)
+					//did not encounter this case with dummy.c
+					if (argNumber >= TypeRef.size()) {
+						errs() << "TypeArray request out of bounds. Are parameters coerced??\n";
+						goto done;
+					}
+
+					if (const auto &ArgTypeRef = TypeRef[argNumber]) {
+						// Resolve the type
+						DIType *Ty = ArgTypeRef.resolve(TypeIdentifierMap);
+						// Handle Pointer type
+						getAllNames(Ty, offNames, 0, "", "  ", argName, structName);
 				}
-
-				const auto &TypeRef = subRoutine->getTypeArray();
-
-				/// XXX: When function arguments are coerced in IR, the corresponding
-				/// debugInfo extracted for that function from the source code will
-				/// not have the same number of arguments. Check the indexes to
-				/// prevent array out of bounds exception (segfault)
-				//did not encounter this case with dummy.c
-				if (argNumber >= TypeRef.size()) {
-					errs() << "TypeArray request out of bounds. Are parameters coerced??\n";
-					goto done;
-				}
-
-				if (const auto &ArgTypeRef = TypeRef[argNumber]) {
-					// Resolve the type
-					DIType *Ty = ArgTypeRef.resolve(TypeIdentifierMap);
-					// Handle Pointer type
-					getAllNames(Ty, offNames, 0, "", "  ", argName, structName);
 				}
 			}
+		}	
+		done:
+		return offNames;
+}
+
+	std::string getTypeNameFromDINode(DIType* dt) {
+		while(dt->getName().str() == "") {
+			dt = dyn_cast<DIDerivedType>(dt)->getBaseType().resolve(TypeIdentifierMap);
 		}
+		return dt->getName().str();
 	}
-done:
-	return offNames;
-}
 
-std::string getTypeNameFromDINode(DIType* dt) {
-	while(dt->getName().str() == "") {
-		dt = dyn_cast<DIDerivedType>(dt)->getBaseType().resolve(TypeIdentifierMap);
-	}
-	return dt->getName().str();
-}
-
-std::string getTypeName(DIType* dt, std::string function, std::string fieldName) {
-	if (DIBasicType* bt = dyn_cast<DIBasicType>(dt)) {
-		return bt->getName().str() + " " + fieldName;
-	} else if (DICompositeType* ct = dyn_cast<DICompositeType>(dt)) {
-		if (ct->getTag() == dwarf::DW_TAG_union_type) {
-			return "union " + fieldName;
-		} else {
+	std::string getTypeName(DIType* dt, std::string function, std::string fieldName) {
+		if (DIBasicType* bt = dyn_cast<DIBasicType>(dt)) {
+			return bt->getName().str() + " " + fieldName;
+		} else if (DICompositeType* ct = dyn_cast<DICompositeType>(dt)) {
+			if (ct->getTag() == dwarf::DW_TAG_union_type) {
+				return "union " + fieldName;
+			} else {
 			return "projection " + function + "." + ct->getName().str() + " *" + fieldName;
-		}
-	} else if (DISubroutineType* sr = dyn_cast<DISubroutineType>(dt)) {
+			}
+		} else if (DISubroutineType* sr = dyn_cast<DISubroutineType>(dt)) {
 		//if (!sr->getType()) {
 		//return "rpc function " + "(*" + fieldName + ")()";  
 		//} else {
-		std::string name("rpc ");
-		const DITypeRefArray &types = sr->getTypeArray();
-		if (!types[0]) {
-			//return type void
-			name += "void (*" + fieldName + ") (";
-		} else {
-			DIType *ty = types[0].resolve(TypeIdentifierMap);
-			//DIType *baseTy = getLowestDINode(ty);
+			std::string name("rpc ");
+			const DITypeRefArray &types = sr->getTypeArray();
+			if (!types[0]) {
+				//return type void
+				name += "void (*" + fieldName + ") (";
+			} else {
+				DIType *ty = types[0].resolve(TypeIdentifierMap);
+				//DIType *baseTy = getLowestDINode(ty);
 
-			name += getTypeNameFromDINode(ty) + " (*" + fieldName + ") (";
-		}
-		unsigned int paramIndex = 1;
-		while (paramIndex < types.size()) {
-			DIType *ty = types[paramIndex].resolve(TypeIdentifierMap);
-			ty->dump();
-			//name += getTypeNameFromDINode(ty) + ", ";
-			name += getTypeName(ty, function, "") + ", ";
-			paramIndex++;
-		}
-		name += ");";
-		return name;
-		//}
-	} else {
-		if (DITypeRef temp = dyn_cast<DIDerivedType>(dt)->getBaseType()) {
-			DIType *baseTy = temp.resolve(TypeIdentifierMap);
-			return getTypeName(baseTy, function, fieldName);
-		}
+				name += getTypeNameFromDINode(ty) + " (*" + fieldName + ") (";
+			}
+			unsigned int paramIndex = 1;
+			while (paramIndex < types.size()) {
+				DIType *ty = types[paramIndex].resolve(TypeIdentifierMap);
+				ty->dump();
+				//name += getTypeNameFromDINode(ty) + ", ";
+				name += getTypeName(ty, function, "") + ", ";
+				paramIndex++;
+			}
+			name += ");";
+			return name;
+			//}
+		} else {
+			if (DITypeRef temp = dyn_cast<DIDerivedType>(dt)->getBaseType()) {
+				DIType *baseTy = temp.resolve(TypeIdentifierMap);
+				return getTypeName(baseTy, function, fieldName);
+			}
 		/*DIType *baseTy =
 		  dyn_cast<DIDerivedType>(dt)->getBaseType().resolve(TypeIdentifierMap);
 		  while ((baseTy->getTag() == dwarf::DW_TAG_typedef || baseTy->getTag() == dwarf::DW_TAG_const_type 
@@ -289,8 +293,8 @@ std::string getTypeName(DIType* dt, std::string function, std::string fieldName)
 		  break;
 		  }
 		  return baseTy->getName().str();*/
+		}
 	}
-}
 
 void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
 		offsetNames &of, std::string functionName, std::string indent) {
@@ -377,12 +381,12 @@ bool DSAGenerator::runOnModule(Module &m) {
 
 			//Return true if the primary definition of this global value is outside of the current translation unit.
 			if (F.isDeclaration()) {
-			errs() << "an undefined function{"<< F.getName().str()<<"}\n";
+				errs() << "an undefined function{"<< F.getName().str()<<"}\n";
 				undefinedFunctionsFile << F.getName().str() << "\n";
 				continue;
 			}
 			else {
-			errs() << "a defined function{"<< F.getName().str()<<"}\n";
+				errs() << "a defined function{"<< F.getName().str()<<"}\n";
 				definedFunctionsFile << F.getName().str() << "\n";
 			}
 
@@ -415,7 +419,7 @@ bool DSAGenerator::runOnModule(Module &m) {
 					DSNode *node = nodeHandle.getNode();
                                         errs() << "isglobal: " << node->isGlobalNode() << "-------------------\n";
                                         if (node->isGlobalNode())
-					  continue;
+						continue;
 					std::string structName;
 					errs() << "arg.getArgNo(){"<<arg.getArgNo()<<"}\n";
 					offsetNames of = getArgFieldNames(F, arg.getArgNo() + 1, arg.getName(), structName);
