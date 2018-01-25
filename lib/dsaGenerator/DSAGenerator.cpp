@@ -234,7 +234,7 @@ namespace dsa {
 		}	
 		done:
 		return offNames;
-}
+	}
 
 	std::string getTypeNameFromDINode(DIType* dt) {
 		while(dt->getName().str() == "") {
@@ -296,188 +296,188 @@ namespace dsa {
 		}
 	}
 
-void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
-		offsetNames &of, std::string functionName, std::string indent) {
-	DSNode::const_offset_iterator ii, ei;
-	//int sz, i=0;
-	if (op.str() == "read") {
-		file << "\n" << indent << "Read: \n";
-		ii = node.read_offset_begin();
-		ei = node.read_offset_end();
-		//sz = node.read_offset_sz();
-	} else if (op.str() == "write") {
-		file << "\n" << indent << "Write: \n";
-		ii = node.write_offset_begin();
-		ei = node.write_offset_end();
-		//sz = node.write_offset_sz();
-	}
-	//errs() << "size: " << sz << "\n";
-	for (; ii != ei; ii++) {
-		unsigned offset = *ii;
-		std::string Name("????");
-		if (of.find(offset) != of.end()) {
-			Name = of.at(offset).first;
+	void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
+			offsetNames &of, std::string functionName, std::string indent) {
+		DSNode::const_offset_iterator ii, ei;
+		//int sz, i=0;
+		if (op.str() == "read") {
+			file << "\n" << indent << "Read: \n";
+			ii = node.read_offset_begin();
+				ei = node.read_offset_end();
+			//sz = node.read_offset_sz();
+		} else if (op.str() == "write") {
+			file << "\n" << indent << "Write: \n";
+			ii = node.write_offset_begin();
+			ei = node.write_offset_end();
+			//sz = node.write_offset_sz();
 		}
-		errs() << indent << " offset: " << *ii << "\t\t" << Name << "\n";
-		of.at(offset).second->dump();
-		file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
-	}
-}
-
-bool DSAGenerator::runOnModule(Module &m) {
-
-	//include/dsaGenerator/DSAGenerator.h +17 //BU Definition
-	//https://github.com/llvm-mirror/poolalloc/blob/master/include/dsa/DataStructure.h line 22
-	//http://llvm.org/doxygen/classllvm_1_1Pass.html#a4863e5e463fb79955269fbf7fbf52b80
-	BU = &getAnalysis<BUDataStructures>();
-
-        std::error_code EC;
-  	llvm::raw_fd_ostream F("bu", EC, sys::fs::OpenFlags::F_None);
-        BU->print(F, &m);
-	if (NamedMDNode *CU_Nodes = m.getNamedMetadata("llvm.dbg.cu")) {
-		//include/llvm/IR/DebugInfo.h:37:typedef DenseMap<const MDString *, DIType *> DITypeIdentifierMap;
-		//MDString is a A single uniqued string. These are used to efficiently contain a byte sequence for metadata. 
-		//DIType (DebugInfo Type) - the base class for types.  
-		TypeIdentifierMap = generateDITypeIdentifierMap(CU_Nodes);
-	}
-	//std::error_code EC;
-	//StringRef b("bu");
-	//llvm::raw_fd_ostream F1(b, EC, sys::fs::OpenFlags::F_None);
-	//std::ofstream F1("bu");
-	//BU->print(F1, &m);
-	std::ofstream file(m.getName().str() + ".idl");
-	std::ofstream undefinedFunctionsFile(m.getName().str() + "_undefined_functions.txt");
-	std::ofstream definedFunctionsFile(m.getName().str() + "_defined_functions.txt");
-	std::string functionsListFile = getFunctionsList();
-	std::unordered_set<std::string> functions;
-
-	//functionsListFile is empty, the following is not invoked.
-	if(!functionsListFile.empty()) {
-		std::ifstream functionFile(functionsListFile);
-		std::copy(std::istream_iterator<std::string>(functionFile),
-				std::istream_iterator<std::string>(),
-				std::inserter(functions, functions.begin()));
-	}
-
-	// scans through all caller callee functions.
-	
-	//char funcname[15];
-//	strcpy(funcname, "register_netdevice");
-//	int result;
-
-	for (auto &F : m) {
-		//result = strcmp(F.getName().str,funcname);
-		//if (result==0){
-		//ah46 if (F.getName().str()=="register_netdevice"){	
-// 		errs()<<"Test successful ah\n";
-
-
-		errs() << "Scanning Function {"<<F.getName().str()<<"}\n";
-
-		//ignore functions like llvm.debug.declare
-		if (F.getName().find("llvm") == std::string::npos 
-				&& (functions.empty() || functions.find(F.getName()) != functions.end())) {
-			//functions is empty
-
-			//Return true if the primary definition of this global value is outside of the current translation unit.
-			if (F.isDeclaration()) {
-				errs() << "an undefined function{"<< F.getName().str()<<"}\n";
-				undefinedFunctionsFile << F.getName().str() << "\n";
-				continue;
+		//errs() << "size: " << sz << "\n";
+		for (; ii != ei; ii++) {
+			unsigned offset = *ii;
+			std::string Name("????");
+			if (of.find(offset) != of.end()) {
+				Name = of.at(offset).first;
 			}
-			else {
-				errs() << "a defined function{"<< F.getName().str()<<"}\n";
-				definedFunctionsFile << F.getName().str() << "\n";
-			}
+			errs() << indent << " offset: " << *ii << "\t\t" << Name << "\n";
+			of.at(offset).second->dump();
+			file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
+		}
+	}
 
-			//include/dsa/DSGraph.h +194	
-			DSGraph *graph = BU->getDSGraph(F);
-			
-			//include/dsa/DSNode.h +43
-			std::vector<DSNode *> argumentNodes;
+	bool DSAGenerator::runOnModule(Module &m) {
 
-			//errs() << "has metadata: " << F.hasMetadata() << "\n";
+		//include/dsaGenerator/DSAGenerator.h +17 //BU Definition
+		//https://github.com/llvm-mirror/poolalloc/blob/master/include/dsa/DataStructure.h line 22
+		//http://llvm.org/doxygen/classllvm_1_1Pass.html#a4863e5e463fb79955269fbf7fbf52b80
+		BU = &getAnalysis<BUDataStructures>();
 
-			//include/llvm/ADT/iterator_range.h +32 | args is an iterator range
-			//arguments of undefined functions are not available
-			for (auto &arg : F.args()) {
-				errs() << "Scanning argument {" << arg.getName().str() << "}\n";
-				if (arg.hasName()) {
-					errs() << arg.getArgNo() << " = arg -->" << arg.getName().str() << "\n";
+		std::error_code EC;
+		llvm::raw_fd_ostream F("bu", EC, sys::fs::OpenFlags::F_None);
+		BU->print(F, &m);
+		if (NamedMDNode *CU_Nodes = m.getNamedMetadata("llvm.dbg.cu")) {
+			//include/llvm/IR/DebugInfo.h:37:typedef DenseMap<const MDString *, DIType *> DITypeIdentifierMap;
+			//MDString is a A single uniqued string. These are used to efficiently contain a byte sequence for metadata. 
+			//DIType (DebugInfo Type) - the base class for types.  
+			TypeIdentifierMap = generateDITypeIdentifierMap(CU_Nodes);
+		}
+		//std::error_code EC;
+		//StringRef b("bu");
+		//llvm::raw_fd_ostream F1(b, EC, sys::fs::OpenFlags::F_None);
+		//std::ofstream F1("bu");
+		//BU->print(F1, &m);
+		std::ofstream file(m.getName().str() + ".idl");
+		std::ofstream undefinedFunctionsFile(m.getName().str() + "_undefined_functions.txt");
+		std::ofstream definedFunctionsFile(m.getName().str() + "_defined_functions.txt");
+		std::string functionsListFile = getFunctionsList();
+		std::unordered_set<std::string> functions;
+
+		//functionsListFile is empty, the following is not invoked.
+		if(!functionsListFile.empty()) {
+			std::ifstream functionFile(functionsListFile);
+			std::copy(std::istream_iterator<std::string>(functionFile),
+					std::istream_iterator<std::string>(),
+					std::inserter(functions, functions.begin()));
+		}
+
+		// scans through all caller callee functions.
+		
+		//char funcname[15];
+		//	strcpy(funcname, "register_netdevice");
+		//	int result;
+
+		for (auto &F : m) {
+			//result = strcmp(F.getName().str,funcname);
+			//if (result==0){
+			//ah46 if (F.getName().str()=="register_netdevice"){	
+		// 		errs()<<"Test successful ah\n";
+
+
+			errs() << "Scanning Function {"<<F.getName().str()<<"}\n";
+
+			//ignore functions like llvm.debug.declare
+			if (F.getName().find("llvm") == std::string::npos 
+					&& (functions.empty() || functions.find(F.getName()) != functions.end())) {
+				//functions is empty
+
+				//Return true if the primary definition of this global value is outside of the current translation unit.
+				if (F.isDeclaration()) {
+					errs() << "an undefined function{"<< F.getName().str()<<"}\n";
+					undefinedFunctionsFile << F.getName().str() << "\n";
+					continue;
 				}
-
-				//did not find the following case to be true
 				else {
-					errs() << "arg does not have a name";
+					errs() << "a defined function{"<< F.getName().str()<<"}\n";
+					definedFunctionsFile << F.getName().str() << "\n";
 				}
 
-				// XXX: What about non-pointer variables ??
-				if (arg.getType()->isPointerTy()) {
+				//include/dsa/DSGraph.h +194	
+				DSGraph *graph = BU->getDSGraph(F);
+				
+				//include/dsa/DSNode.h +43
+				std::vector<DSNode *> argumentNodes;
 
-					//include/dsa/DSSupport.h +54
-					DSNodeHandle &nodeHandle = graph->getNodeForValue(&arg);
-					DSNode *node = nodeHandle.getNode();
-                                        errs() << "isglobal: " << node->isGlobalNode() << "-------------------\n";
-                                        if (node->isGlobalNode())
-						continue;
-					std::string structName;
-					errs() << "arg.getArgNo(){"<<arg.getArgNo()<<"}\n";
-					offsetNames of = getArgFieldNames(F, arg.getArgNo() + 1, arg.getName(), structName);
-					dumpOffsetNames(of);
-					//file << "collapsed: " << node->isCollapsedNode() << "\n";
-					//file << "forward: " << node->isForwarding() << "\n";
-					std::vector<DSNode *> visitedNodes;
+				//errs() << "has metadata: " << F.hasMetadata() << "\n";
 
-					visitedNodes.push_back(node);
-					printOffsets(node, "", &file, &visitedNodes, of, arg.getType(), arg.getName(), structName, F.getName().str());
+				//include/llvm/ADT/iterator_range.h +32 | args is an iterator range
+				//arguments of undefined functions are not available
+				for (auto &arg : F.args()) {
+					errs() << "Scanning argument {" << arg.getName().str() << "}\n";
+					if (arg.hasName()) {
+						errs() << arg.getArgNo() << " = arg -->" << arg.getName().str() << "\n";
+					}
+
+					//did not find the following case to be true
+					else {
+						errs() << "arg does not have a name";
+					}
+
+					// XXX: What about non-pointer variables ??
+					if (arg.getType()->isPointerTy()) {
+
+						//include/dsa/DSSupport.h +54
+						DSNodeHandle &nodeHandle = graph->getNodeForValue(&arg);
+						DSNode *node = nodeHandle.getNode();
+						errs() << "isglobal: " << node->isGlobalNode() << "-------------------\n";
+						if (node->isGlobalNode())
+							continue;
+						std::string structName;
+						errs() << "arg.getArgNo(){"<<arg.getArgNo()<<"}\n";
+						offsetNames of = getArgFieldNames(F, arg.getArgNo() + 1, arg.getName(), structName);
+						dumpOffsetNames(of);
+						//file << "collapsed: " << node->isCollapsedNode() << "\n";
+						//file << "forward: " << node->isForwarding() << "\n";
+						std::vector<DSNode *> visitedNodes;
+
+						visitedNodes.push_back(node);
+						printOffsets(node, "", &file, &visitedNodes, of, arg.getType(), arg.getName(), structName, F.getName().str());
+					}
+					file << "\n";
 				}
+			}
+		//	}//new if check@ah46
+
+		}
+		//errs() << "global names\n";
+		//errs() << "size: " << m.getGlobalList().size() << "\n";
+		//for(llvm::Module::global_iterator gi = m.global_begin(); gi != m.global_end(); gi++) {
+		/*for(auto &gi : m.globals()) {
+			gi.dump();
+			errs() << gi.getName() << "\n";
+			gi.getType()->dump();
+		}*/
+
+		/*for(auto& nmd: m.getNamedMDList()) {
+		  nmd.dump();
+		  }*/
+		NamedMDNode* nmd = m.getNamedMetadata("llvm.dbg.cu");
+		if(DICompileUnit* cu = dyn_cast<DICompileUnit>(nmd->getOperand(0))) {
+			DIGlobalVariableArray globalVariables = cu->getGlobalVariables();
+			DSGraph* graph = BU->getGlobalsGraph();
+			for(unsigned int i=0; i<globalVariables.size(); i++) {
+				//globalVariables[i]->dump();
+				//errs() << globalVariables[i]->getDisplayName().str() << "\n";
+				Constant* var = globalVariables[i]->getVariable();
+				//var->dump();
+				DIType* diType = globalVariables[i]->getType().resolve(TypeIdentifierMap);
+				std::string structName;
+				offsetNames of;
+				getAllNames(diType, of, 0, "", "  ", globalVariables[i]->getDisplayName(), structName);
+				//offsetNames of = getArgFieldNames(F, arg.getArgNo() + 1, arg.getName(), structName);
+				dumpOffsetNames(of);
+				DSNodeHandle &nodeHandle = graph->getNodeForValue(var);
+				DSNode *node = nodeHandle.getNode();
+				errs() << "name: " << globalVariables[i]->getDisplayName() << "-------------\n";
+				errs() << "is global: " << node->isGlobalNode() << "---------------\n";
+				//file << "collapsed: " << node->isCollapsedNode() << "\n";
+				//file << "forward: " << node->isForwarding() << "\n";
+				std::vector<DSNode *> visitedNodes;
+				visitedNodes.push_back(node);
+				printOffsets(node, "", &file, &visitedNodes, of, var->getType(), globalVariables[i]->getDisplayName(), structName, "bu.global");
 				file << "\n";
 			}
 		}
-	//	}//new if check@ah46
-
+		return false;
 	}
-	//errs() << "global names\n";
-	//errs() << "size: " << m.getGlobalList().size() << "\n";
-	//for(llvm::Module::global_iterator gi = m.global_begin(); gi != m.global_end(); gi++) {
-	/*for(auto &gi : m.globals()) {
-		gi.dump();
-		errs() << gi.getName() << "\n";
-		gi.getType()->dump();
-	}*/
-
-	/*for(auto& nmd: m.getNamedMDList()) {
-	  nmd.dump();
-	  }*/
-	NamedMDNode* nmd = m.getNamedMetadata("llvm.dbg.cu");
-	if(DICompileUnit* cu = dyn_cast<DICompileUnit>(nmd->getOperand(0))) {
-		DIGlobalVariableArray globalVariables = cu->getGlobalVariables();
-                DSGraph* graph = BU->getGlobalsGraph();
-		for(unsigned int i=0; i<globalVariables.size(); i++) {
-			//globalVariables[i]->dump();
-			//errs() << globalVariables[i]->getDisplayName().str() << "\n";
-			Constant* var = globalVariables[i]->getVariable();
-                        //var->dump();
-			DIType* diType = globalVariables[i]->getType().resolve(TypeIdentifierMap);
-			std::string structName;
-			offsetNames of;
-                        getAllNames(diType, of, 0, "", "  ", globalVariables[i]->getDisplayName(), structName);
-			//offsetNames of = getArgFieldNames(F, arg.getArgNo() + 1, arg.getName(), structName);
-			dumpOffsetNames(of);
-			DSNodeHandle &nodeHandle = graph->getNodeForValue(var);
-			DSNode *node = nodeHandle.getNode();
-                        errs() << "name: " << globalVariables[i]->getDisplayName() << "-------------\n";
-                        errs() << "is global: " << node->isGlobalNode() << "---------------\n";
-			//file << "collapsed: " << node->isCollapsedNode() << "\n";
-			//file << "forward: " << node->isForwarding() << "\n";
-			std::vector<DSNode *> visitedNodes;
-			visitedNodes.push_back(node);
-			printOffsets(node, "", &file, &visitedNodes, of, var->getType(), globalVariables[i]->getDisplayName(), structName, "bu.global");
-                        file << "\n";
-		}
-	}
-	return false;
-}
 // Pass ID variable
 char DSAGenerator::ID = 0;
 }
