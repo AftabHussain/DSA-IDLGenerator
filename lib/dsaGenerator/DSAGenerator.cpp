@@ -46,15 +46,20 @@ namespace dsa {
 			std::vector<DSNode *> *visitedNodes, offsetNames &of2, 
 			Type* elementType, StringRef elementName, std::string& structName, std::string functionName) {
 		if(structName != "") {
+			
+			//------UNEXAMINED (MAY BE USEFUL LATER)---------------//
 			//arg.dump();
 			//errs() << "\nis pointer: " << isa<PointerType>(arg.getType()) << "\n";
-			//errs() << "\nis struct: " << dyn_cast<StructType>(dyn_cast<PointerType>(arg.getType())->getElementType())->getName().str() << "\n";
+			//errs() << "\nis struct: " << dyn_cast<StructType>(dyn_cast<Pointe
+			//rType>(arg.getType())->getElementType())->getName().str() << "\n";
 			//if(dyn_cast<PointerType>(arg.getType())->getElementType()->getStructName() != NULL)
 			//*file << indentation << "\nprojection <struct " << arg
 			//.getType()
 			//->getStructName()
 			//     .str() << "> " << structName << " {";
 			//else
+			//------------------------------------------------------//
+			
 			Type* argType = elementType;
 
 			while(!isa<StructType>(argType)) {
@@ -180,8 +185,7 @@ namespace dsa {
 		} else {
 			structName = "";
 		}
-		//}
-}
+	}
 
 	//Gets the field names of a structure
 	offsetNames getArgFieldNames(Function &F, unsigned argNumber, StringRef argName, std::string& structName) {
@@ -360,17 +364,7 @@ namespace dsa {
 		}
 
 		// scans through all caller callee functions.
-		
-		//char funcname[15];
-		//	strcpy(funcname, "register_netdevice");
-		//	int result;
-
 		for (auto &F : m) {
-			//result = strcmp(F.getName().str,funcname);
-			//if (result==0){
-			//ah46 if (F.getName().str()=="register_netdevice"){	
-		// 		errs()<<"Test successful ah\n";
-
 
 			errs() << "Scanning Function {"<<F.getName().str()<<"}\n";
 
@@ -434,21 +428,8 @@ namespace dsa {
 					file << "\n";
 				}
 			}
-		//	}//new if check@ah46
-
 		}
-		//errs() << "global names\n";
-		//errs() << "size: " << m.getGlobalList().size() << "\n";
-		//for(llvm::Module::global_iterator gi = m.global_begin(); gi != m.global_end(); gi++) {
-		/*for(auto &gi : m.globals()) {
-			gi.dump();
-			errs() << gi.getName() << "\n";
-			gi.getType()->dump();
-		}*/
 
-		/*for(auto& nmd: m.getNamedMDList()) {
-		  nmd.dump();
-		  }*/
 		NamedMDNode* nmd = m.getNamedMetadata("llvm.dbg.cu");
 		if(DICompileUnit* cu = dyn_cast<DICompileUnit>(nmd->getOperand(0))) {
 			DIGlobalVariableArray globalVariables = cu->getGlobalVariables();
@@ -478,6 +459,7 @@ namespace dsa {
 		}
 		return false;
 	}
-// Pass ID variable
-char DSAGenerator::ID = 0;
+
+	// Pass ID variable [Not used anywhere]
+	char DSAGenerator::ID = 0;
 }
