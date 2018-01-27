@@ -307,7 +307,7 @@ namespace dsa {
 		if (op.str() == "read") {
 			file << "\n" << indent << "Read: \n";
 			ii = node.read_offset_begin();
-				ei = node.read_offset_end();
+			ei = node.read_offset_end();
 			//sz = node.read_offset_sz();
 		} else if (op.str() == "write") {
 			file << "\n" << indent << "Write: \n";
@@ -324,7 +324,7 @@ namespace dsa {
 			}
 			errs() << indent << " offset: " << *ii << "\t\t" << Name << "\n";
 			of.at(offset).second->dump();
-			file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
+			//file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
 		}
 	}
 
@@ -352,16 +352,16 @@ namespace dsa {
 		std::ofstream file(m.getName().str() + ".idl");
 		std::ofstream undefinedFunctionsFile(m.getName().str() + "_undefined_functions.txt");
 		std::ofstream definedFunctionsFile(m.getName().str() + "_defined_functions.txt");
-		std::string functionsListFile = getFunctionsList();
-		std::unordered_set<std::string> functions;
+		//std::string functionsListFile = getFunctionsList();
+		//std::unordered_set<std::string> functions;
 
 		//functionsListFile is empty, the following is not invoked.
-		if(!functionsListFile.empty()) {
+		/*if(!functionsListFile.empty()) {
 			std::ifstream functionFile(functionsListFile);
 			std::copy(std::istream_iterator<std::string>(functionFile),
 					std::istream_iterator<std::string>(),
 					std::inserter(functions, functions.begin()));
-		}
+		}*/
 
 		// scans through all caller callee functions.
 		for (auto &F : m) {
@@ -369,9 +369,9 @@ namespace dsa {
 			errs() << "Scanning Function {"<<F.getName().str()<<"}\n";
 
 			//ignore functions like llvm.debug.declare
-			if (F.getName().find("llvm") == std::string::npos 
-					&& (functions.empty() || functions.find(F.getName()) != functions.end())) {
-				//functions is empty
+			//http://en.cppreference.com/w/cpp/string/basic_string/npos	
+			if (F.getName().find("llvm") == std::string::npos){ 
+			//&& (functions.empty() || functions.find(F.getName()) != functions.end())) {
 
 				//Return true if the primary definition of this global value is outside of the current translation unit.
 				if (F.isDeclaration()) {
