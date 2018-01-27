@@ -326,6 +326,8 @@ namespace dsa {
 			of.at(offset).second->dump();
 
 			//TODO THIS IS THE LINE THAT WAS CAUSING A DOUBLE FREE ERROR WHILE PROCESSING NET.O.BC (NEED TO SEE THIS CODE LATER, WHETHER WE NEED IT AT ALL)
+			//MORE INFO: found if this line is not used. net.o.bc.idl is blank, however, dummy.bc.idl is still generated (has content, i.e. projections, without checking for 
+			//their correctness at the moment)
 			//file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
 
 		}
