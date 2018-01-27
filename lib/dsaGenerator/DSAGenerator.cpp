@@ -324,7 +324,10 @@ namespace dsa {
 			}
 			errs() << indent << " offset: " << *ii << "\t\t" << Name << "\n";
 			of.at(offset).second->dump();
+
+			//TODO THIS IS THE LINE THAT WAS CAUSING A DOUBLE FREE ERROR WHILE PROCESSING NET.O.BC (NEED TO SEE THIS CODE LATER, WHETHER WE NEED IT AT ALL)
 			//file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
+
 		}
 	}
 
