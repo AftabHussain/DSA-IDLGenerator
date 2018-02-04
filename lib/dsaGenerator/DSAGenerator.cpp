@@ -27,10 +27,8 @@ namespace dsa {
 
 	typedef std::map<unsigned, std::pair<std::string, DIType *>> offsetNames;
 	DITypeIdentifierMap TypeIdentifierMap;
-	void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
-			offsetNames &of, std::string, std::string);
-	void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
-			std::string baseName, std::string indent, StringRef argName, std::string&);
+	void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op, offsetNames &of, std::string, std::string);
+	void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off, std::string baseName, std::string indent, StringRef argName, std::string&);
 
 	/// Prints it in console. Solely for debugging purposes
 	void dumpOffsetNames(offsetNames &of) {
@@ -142,6 +140,7 @@ namespace dsa {
 		return Ty;
 	}
 
+	/*Recursive Fn called by getArgFieldNames*/
 	void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
 			std::string baseName, std::string indent, StringRef argName, std::string& structName) {
 		//if(prev_off >= 1024) return;
@@ -187,7 +186,7 @@ namespace dsa {
 		}
 	}
 
-	//Gets the field names of a structure
+	/*Called by runOnModule - Gets the field names of a structure*/
 	offsetNames getArgFieldNames(Function &F, unsigned argNumber, StringRef argName, std::string& structName) {
 
 		errs() << "F.getName(){"<<F.getName()<<"}\n";
@@ -205,7 +204,7 @@ namespace dsa {
 		errs() << "## Function ## : " << F.getName().str()
 		<< " | argsize: " << F.arg_size() << " :: Requested " << argNumber
 		<< "\n";
-		//GGL smallvector llvm
+		//Google smallvector llvm
 		SmallVector<std::pair<unsigned, MDNode *>, 4> MDs;
 		F.getAllMetadata(MDs);
 		for (auto &MD : MDs) {
@@ -240,6 +239,7 @@ namespace dsa {
 		return offNames;
 	}
 
+	/*Called by getTypeName*/	
 	std::string getTypeNameFromDINode(DIType* dt) {
 		while(dt->getName().str() == "") {
 			dt = dyn_cast<DIDerivedType>(dt)->getBaseType().resolve(TypeIdentifierMap);
@@ -247,6 +247,7 @@ namespace dsa {
 		return dt->getName().str();
 	}
 
+	/*Recursive Function - first called by offsetPrinter*/
 	std::string getTypeName(DIType* dt, std::string function, std::string fieldName) {
 		if (DIBasicType* bt = dyn_cast<DIBasicType>(dt)) {
 			return bt->getName().str() + " " + fieldName;
@@ -300,6 +301,7 @@ namespace dsa {
 		}
 	}
 
+	/*Called by runOnModule*/
 	void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
 			offsetNames &of, std::string functionName, std::string indent) {
 		DSNode::const_offset_iterator ii, ei;
@@ -327,39 +329,61 @@ namespace dsa {
 
 			//TODO THIS IS THE LINE THAT WAS CAUSING A DOUBLE FREE ERROR WHILE PROCESSING NET.O.BC (NEED TO SEE THIS CODE LATER, WHETHER WE NEED IT AT ALL)
 			//MORE INFO: found if this line is not used. net.o.bc.idl is blank, however, dummy.bc.idl is still generated (has content, i.e. projections, without checking for 
-			//their correctness at the moment)
-			//file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
+			//their correctness at the moment--This prints the offsets in the idl file.)
+	//		file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
+			
 
 		}
 	}
 
 	bool DSAGenerator::runOnModule(Module &m) {
 
-		//include/dsaGenerator/DSAGenerator.h +17 //BU Definition
-		//https://github.com/llvm-mirror/poolalloc/blob/master/include/dsa/DataStructure.h line 22
-		//http://llvm.org/doxygen/classllvm_1_1Pass.html#a4863e5e463fb79955269fbf7fbf52b80
+		/*include/dsaGenerator/DSAGenerator.h +17 //BU Definition
+		https://github.com/llvm-mirror/poolalloc/blob/master/include/dsa/DataStructure.h line 22
+		http://llvm.org/doxygen/classllvm_1_1Pass.html#a4863e5e463fb79955269fbf7fbf52b80
+		BUDataStructures - The analysis that computes the interprocedurally closed
+ 		data structure graphs for all of the functions in the program.  This pass
+		only performs a "Bottom Up" propagation (hence the name).
+		https://github.com/llvm-mirror/poolalloc/blob/eb3a28cc226248240eb05273f543aca074979930/include/dsa/DataStructure.h#L218
+		*/
 		BU = &getAnalysis<BUDataStructures>();
 
 		std::error_code EC;
+
+		/*Open the specified file for writing.
+		If an error occurs, information about the error is put into EC, 
+		and the stream should be immediately destroyed; Flags allows optional flags to control how the file will be opened.
+		*/
 		llvm::raw_fd_ostream F("bu", EC, sys::fs::OpenFlags::F_None);
+
+
+		/*prints the analysis results - a function of BU's parent class - DataStructures in poolalloc*/
 		BU->print(F, &m);
+
 		if (NamedMDNode *CU_Nodes = m.getNamedMetadata("llvm.dbg.cu")) {
-			//include/llvm/IR/DebugInfo.h:37:typedef DenseMap<const MDString *, DIType *> DITypeIdentifierMap;
-			//MDString is a A single uniqued string. These are used to efficiently contain a byte sequence for metadata. 
-			//DIType (DebugInfo Type) - the base class for types.  
+
+			/*include/llvm/IR/DebugInfo.h:37:typedef DenseMap<const MDString *, DIType *> DITypeIdentifierMap;
+			MDString is a A single uniqued string. These are used to efficiently contain a byte sequence for metadata. 
+			DIType (DebugInfo Type) - the base class for types.*/  
 			TypeIdentifierMap = generateDITypeIdentifierMap(CU_Nodes);
+
 		}
-		//std::error_code EC;
-		//StringRef b("bu");
-		//llvm::raw_fd_ostream F1(b, EC, sys::fs::OpenFlags::F_None);
-		//std::ofstream F1("bu");
-		//BU->print(F1, &m);
+
+		/* Unused Code
+		std::error_code EC;
+		StringRef b("bu");
+		llvm::raw_fd_ostream F1(b, EC, sys::fs::OpenFlags::F_None);
+		std::ofstream F1("bu");
+		BU->print(F1, &m);
+		*/
+
 		std::ofstream file(m.getName().str() + ".idl");
 		std::ofstream undefinedFunctionsFile(m.getName().str() + "_undefined_functions.txt");
 		std::ofstream definedFunctionsFile(m.getName().str() + "_defined_functions.txt");
+
+		/* Unused Code	
 		//std::string functionsListFile = getFunctionsList();
 		//std::unordered_set<std::string> functions;
-
 		//functionsListFile is empty, the following is not invoked.
 		/*if(!functionsListFile.empty()) {
 			std::ifstream functionFile(functionsListFile);
@@ -376,7 +400,7 @@ namespace dsa {
 			//ignore functions like llvm.debug.declare
 			//http://en.cppreference.com/w/cpp/string/basic_string/npos	
 			if (F.getName().find("llvm") == std::string::npos){ 
-			//&& (functions.empty() || functions.find(F.getName()) != functions.end())) {
+			/*Unused condition && (functions.empty() || functions.find(F.getName()) != functions.end())) {*/
 
 				//Return true if the primary definition of this global value is outside of the current translation unit.
 				if (F.isDeclaration()) {
@@ -389,10 +413,15 @@ namespace dsa {
 					definedFunctionsFile << F.getName().str() << "\n";
 				}
 
-				//include/dsa/DSGraph.h +194	
+				/*include/dsa/DSGraph.h +194	
+				The graph that represents a function.*/
 				DSGraph *graph = BU->getDSGraph(F);
 				
-				//include/dsa/DSNode.h +43
+				/*include/dsa/DSNode.h +43
+				DSNode - Data structure node class
+ 				This class represents an untyped memory object of Size bytes.  It keeps
+    				track of any pointers that have been stored into the object as well as the
+    				different types represented in this object.*/
 				std::vector<DSNode *> argumentNodes;
 
 				//errs() << "has metadata: " << F.hasMetadata() << "\n";
@@ -413,7 +442,13 @@ namespace dsa {
 					// XXX: What about non-pointer variables ??
 					if (arg.getType()->isPointerTy()) {
 
-						//include/dsa/DSSupport.h +54
+						/* include/dsa/DSSupport.h +54
+						DSNodeHandle - Implement a "handle" to a data structure node that takes care
+						of all of the add/un'refing of the node to prevent the backpointers in the
+						graph from getting out of date.  This class represents a "pointer" in the
+						graph, whose destination is an indexed offset into a node.
+						getNodeForValue - Given a value that is used or defined in the body of the
+  						current function, return the DSNode that it points to. */
 						DSNodeHandle &nodeHandle = graph->getNodeForValue(&arg);
 						DSNode *node = nodeHandle.getNode();
 						errs() << "isglobal: " << node->isGlobalNode() << "-------------------\n";
@@ -465,6 +500,6 @@ namespace dsa {
 		return false;
 	}
 
-	// Pass ID variable [Not used anywhere]
+	// Unused code - Pass ID variable 
 	char DSAGenerator::ID = 0;
 }
