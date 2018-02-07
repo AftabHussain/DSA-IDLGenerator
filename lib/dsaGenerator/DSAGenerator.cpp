@@ -60,10 +60,15 @@ namespace dsa {
 			
 			Type* argType = elementType;
 
+			/* Class to represent struct types. 
+			There are two different kinds of struct types: Literal structs and Identified structs.
+			http://llvm.org/doxygen/classllvm_1_1StructType.html#details*/
 			while(!isa<StructType>(argType)) {
 				argType = dyn_cast<PointerType>(argType)->getElementType();
 			}
 
+			/*substr(7) because names begins with "struct." --- 7 characters
+			projection <struct structure_name> function_name.argument name*/	
 			*file << indentation << "\nprojection <struct " << dyn_cast<StructType>(argType)->getName().substr(7).str() << "> " << functionName << "." << elementName.str() << " {\n";
                         
 			//*file << (node->isCollapsedNode() ? "collapsed\n" : "not collapsed\n");
@@ -472,7 +477,11 @@ namespace dsa {
 			}
 		}
 
+		/*A tuple of MDNodes.*/
 		NamedMDNode* nmd = m.getNamedMetadata("llvm.dbg.cu");
+		/*About Dynamic cast operator and llvm's dyn_cast 
+		http://llvm.org/docs/ProgrammersManual.html#the-isa-cast-and-dyn-cast-templates
+		http://www.bogotobogo.com/cplusplus/dynamic_cast.php*/	
 		if(DICompileUnit* cu = dyn_cast<DICompileUnit>(nmd->getOperand(0))) {
 			DIGlobalVariableArray globalVariables = cu->getGlobalVariables();
 			DSGraph* graph = BU->getGlobalsGraph();

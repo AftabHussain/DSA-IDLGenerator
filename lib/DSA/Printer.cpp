@@ -38,6 +38,8 @@ namespace {
   STATISTIC (NumFoldedNodes , "Number of folded nodes (in final graph)");
 }
 
+/*functions defined for DSNode but outside DSNode using scope resolution. 
+https://www.programmingsimplified.com/cpp/source-code/scope-resolution-operator*/
 void DSNode::dump() const { print(errs(), 0); }
 void DSNode::dumpParentGraph() const { getParentGraph()->dump(); }
 
