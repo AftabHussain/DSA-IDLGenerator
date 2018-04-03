@@ -60,6 +60,11 @@ endif()
 
 include_directories(include)
 
+add_library(assistDS STATIC
+  include/assistDS/Devirt.h
+  lib/AssistDS/Devirt.cpp
+)
+
 add_library(DSAGenerator STATIC
   include/dsaGenerator/DSAGenerator.h
   include/dsaGenerator/UndefinedFunctionsPass.h
@@ -110,12 +115,15 @@ add_library(dsa STATIC
 add_executable(dsaGenerator
   tools/dsaGenerator/dsaGenerator.cpp
 )
+#add_executable(devirt
 
-set_target_properties(dsaGenerator dsa DSAGenerator
+
+set_target_properties(assistDS dsaGenerator dsa DSAGenerator
     PROPERTIES COMPILE_FLAGS "${LLVM_CXXFLAGS}")
 
-target_link_libraries(dsa DSAGenerator ${LLVM_LIBS} ${LLVM_SYSTEM_LIBS} ${LLVM_LDFLAGS})
-target_link_libraries(DSAGenerator dsa)
+target_link_libraries(assistDS dsa DSAGenerator ${LLVM_LIBS} ${LLVM_SYSTEM_LIBS} ${LLVM_LDFLAGS})
+target_link_libraries(DSAGenerator dsa assistDS)
+
 target_link_libraries(dsaGenerator dsa DSAGenerator)
 
 INSTALL(TARGETS dsaGenerator

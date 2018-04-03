@@ -429,6 +429,6 @@ void DataStructures::dumpCallGraph() const {
 void DataStructures::print(llvm::raw_ostream &O, const Module *M) const {
   if (handleTest(O, M)) return;
 
-  //printCollection(*this, O, M, printname);
-  //dumpCallGraph();
+  printCollection(*this, O, M, printname);
+//  dumpCallGraph();
 }

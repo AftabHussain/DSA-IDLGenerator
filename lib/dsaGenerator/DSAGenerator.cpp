@@ -63,8 +63,10 @@ namespace dsa {
 			/* Class to represent struct types. 
 			There are two different kinds of struct types: Literal structs and Identified structs.
 			http://llvm.org/doxygen/classllvm_1_1StructType.html#details*/
+
 			while(!isa<StructType>(argType)) {
 				argType = dyn_cast<PointerType>(argType)->getElementType();
+			//*file << indentation << "\nargument " << dyn_cast<PointerType>(argType)<< "> " <<" {\n";
 			}
 
 			/*substr(7) because names begins with "struct." --- 7 characters
@@ -168,11 +170,12 @@ namespace dsa {
 				std::string new_name(baseName);
                                 if (new_name != "") new_name.append(".");
 				new_name.append(der->getName().str());
+				errs()<<"type information: "<<der->getBaseType().resolve(TypeIdentifierMap);//->getTag()<<"\n"; 
 				of[offset + prev_off] = std::pair<std::string, DIType *>(
 						new_name, der->getBaseType().resolve(TypeIdentifierMap));
 				/// XXX: crude assumption that we want to peek only into those members
 				/// whose sizes are greater than 8 bytes
-				if (((der->getSizeInBits() >> 3) > 8) 
+				if (((der->getSizeInBits() >> 3) > 1) 
 						&& der->getBaseType().resolve(TypeIdentifierMap)->getTag()) {
 					std::string tempStructName("");
 					getAllNames(dyn_cast<DIType>(der), of, prev_off + offset,
@@ -214,7 +217,12 @@ namespace dsa {
 		F.getAllMetadata(MDs);
 		for (auto &MD : MDs) {
 			if (MDNode *N = MD.second) {
+				errs()<<*N<<" value of the metadata\n";
+				//http://llvm.org/docs/ProgrammersManual.html#the-isa-cast-and-dyn-cast-templates
+				//If the type of the metadata value can be casted to a DISubprogram
 				if (auto *subRoutine = dyn_cast<DISubprogram>(N)->getType()) {
+					
+					//XXX:if a function takes in no arguments, how can we assume it is of type void?
 					if (!subRoutine->getTypeArray()[0]) {
 						errs() << "return type \"void\" for Function : " << F.getName().str()<< "\n";
 					}
@@ -225,6 +233,7 @@ namespace dsa {
 					/// debugInfo extracted for that function from the source code will
 					/// not have the same number of arguments. Check the indexes to
 					/// prevent array out of bounds exception (segfault)
+
 					//did not encounter this case with dummy.c
 					if (argNumber >= TypeRef.size()) {
 						errs() << "TypeArray request out of bounds. Are parameters coerced??\n";
@@ -254,6 +263,7 @@ namespace dsa {
 
 	/*Recursive Function - first called by offsetPrinter*/
 	std::string getTypeName(DIType* dt, std::string function, std::string fieldName) {
+		errs()<<"check type name"<<dt->getName().str();
 		if (DIBasicType* bt = dyn_cast<DIBasicType>(dt)) {
 			return bt->getName().str() + " " + fieldName;
 		} else if (DICompositeType* ct = dyn_cast<DICompositeType>(dt)) {
@@ -323,13 +333,17 @@ namespace dsa {
 			//sz = node.write_offset_sz();
 		}
 		//errs() << "size: " << sz << "\n";
+		errs() << "checking ii ei"<< "\n";
+		errs() << *ii << " " << *ei << "\n" ;
+		
 		for (; ii != ei; ii++) {
 			unsigned offset = *ii;
 			std::string Name("????");
 			if (of.find(offset) != of.end()) {
 				Name = of.at(offset).first;
 			}
-			errs() << indent << " offset: " << *ii << "\t\t" << Name << "\n";
+		//	errs() << indent << " offsetT: " << *ii << "\t\t" << Name << "\n";//for debugging
+		//	file << indent << " offsetT: " << *ii << "\t\t" << Name << "\n";//for debugging
 			of.at(offset).second->dump();
 
 			//TODO THIS IS THE LINE THAT WAS CAUSING A DOUBLE FREE ERROR WHILE PROCESSING NET.O.BC (NEED TO SEE THIS CODE LATER, WHETHER WE NEED IT AT ALL)
@@ -339,6 +353,8 @@ namespace dsa {
 			//also no double free error was generated.
 			//More Development: the function getTypeName(of.at(offset).second, functionName, Name) generates the double free error, and also generates the garbage vaulues in the idl file for net.bc
 			file << indent << " offset: " << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
+		//	file << indent << " offset: " << "\t\t" ;
+		//	file << indent << " offset: " << *ii <<"\n";//<< "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
 			//file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
 		}
 	}
@@ -367,6 +383,7 @@ namespace dsa {
 		/*prints the analysis results - a function of BU's parent class - DataStructures in poolalloc*/
 		BU->print(F, &m);
 
+		// Despite its name, a NamedMDNode isn't itself an MDNode. NamedMDNodes belong to modules, have names, and contain lists of MDNodes.
 		if (NamedMDNode *CU_Nodes = m.getNamedMetadata("llvm.dbg.cu")) {
 
 			/*include/llvm/IR/DebugInfo.h:37:typedef DenseMap<const MDString *, DIType *> DITypeIdentifierMap;
@@ -420,6 +437,8 @@ namespace dsa {
 					definedFunctionsFile << F.getName().str() << "\n";
 				}
 
+				//-----The following happens only for defined functions-----//
+				
 				/*include/dsa/DSGraph.h +194	
 				The graph that represents a function.*/
 				DSGraph *graph = BU->getDSGraph(F);
@@ -434,8 +453,8 @@ namespace dsa {
 				//errs() << "has metadata: " << F.hasMetadata() << "\n";
 
 				//include/llvm/ADT/iterator_range.h +32 | args is an iterator range
-				//arguments of undefined functions are not available
 				for (auto &arg : F.args()) {
+					//if (arg.getType()->isFPOrFPVectorTy()){errs()<<"got function type! arg "<<arg.getName().str()<<"\n";}
 					errs() << "Scanning argument {" << arg.getName().str() << "}\n";
 					if (arg.hasName()) {
 						errs() << arg.getArgNo() << " = arg -->" << arg.getName().str() << "\n";
