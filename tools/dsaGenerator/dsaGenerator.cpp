@@ -77,8 +77,8 @@ int main(int argc, char **argv) {
 
   llvm::legacy::PassManager pass_manager;
 
-  pass_manager.add(new dsa::DSAGenerator(FunctionsList));
-//  pass_manager.add(new assistDS::Devirt(FunctionsList));
+//  pass_manager.add(new dsa::DSAGenerator(FunctionsList));
+  pass_manager.add(new llvm::Devirtualize());
   //pass_manager.add(new dsa::UndefinedFunctionsPass(FunctionsList));
    
   pass_manager.run(*module.get());

@@ -13,10 +13,30 @@
 
 #include "llvm/Support/CommandLine.h"
 #include "llvm/ADT/Statistic.h"
+#include "llvm/Support/Debug.h"
+#include "llvm/IR/DebugInfo.h"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Support/raw_ostream.h"
+#include <stdio.h>
+#include <string.h>
+
+#include <fstream>
+#include <iterator>
+#include <algorithm>
+#include <unordered_set>
+
 
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/InstIterator.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/ValueSymbolTable.h"
 
 using namespace llvm;
 
@@ -54,6 +74,12 @@ PointerType * getVoidPtrType (LLVMContext & C) {
 //
 static inline Value *
 castTo (Value * V, Type * Ty, std::string Name, Instruction * InsertPt) {
+  
+  errs()<<"--- Fn castTo ---\n";
+  errs()<<"Name var "<< Name<<"\n";
+
+
+
   //
   // Don't bother creating a cast if it's already the correct type.
   //
@@ -86,20 +112,28 @@ castTo (Value * V, Type * Ty, std::string Name, Instruction * InsertPt) {
 //  Otherwise, a pointer to a bounce that can replace the call site is
 //  returned.
 //
+// Called by makeDirectCall fn
 const Function *
 Devirtualize::findInCache (const CallSite & CS,
                            std::set<const Function*>& Targets) {
+
+   errs() << "--- findInCache Fn ---\n";
+
   //
   // Iterate through all of the existing bounce functions to see if one of them
   // can be resued.
   //
   std::map<const Function *, std::set<const Function *> >::iterator I;
+
+
   for (I = bounceCache.begin(); I != bounceCache.end(); ++I) {
     //
     // If the bounce function and the function pointer have different types,
     // then skip this bounce function because it is incompatible.
     //
     const Function * bounceFunc = I->first;
+    errs() << "CS.getType() \n"<< CS.getType();
+
 
     // Check the return type
     if (CS.getType() != bounceFunc->getReturnType())
@@ -133,8 +167,13 @@ Devirtualize::findInCache (const CallSite & CS,
 //  target functions and calls the function directly if the pointer
 //  matches.
 //
+// Called by makeDirectCall fn
 Function*
 Devirtualize::buildBounce (CallSite CS, std::vector<const Function*>& Targets) {
+
+  errs()<<"--- Fn buildBounce ---\n";
+
+
   //
   // Update the statistics on the number of bounce functions added to the
   // module.
@@ -293,6 +332,8 @@ Devirtualize::makeDirectCall (CallSite & CS) {
   // Find the targets of the indirect function call.
   //
 
+  errs()<<"--- Fn makeDirectCall ---\n";
+
   //
   // Convert the call site if there were any function call targets found.
   //
@@ -365,24 +406,44 @@ Devirtualize::makeDirectCall (CallSite & CS) {
 //
 void
 Devirtualize::visitCallSite (CallSite &CS) {
+
+  errs() << "--- Fn visitCallSite ---\n";
+ 
   //
   // First, determine if this is a direct call.  If so, then just ignore it.
   //
   Value * CalledValue = CS.getCalledValue();
-  if (isa<Function>(CalledValue->stripPointerCasts()))
+
+  //ignore llvm functions
+  if (CalledValue->getName().find("llvm") != std::string::npos) {
+    errs() << "ignoring llvm lib fn\n";
     return;
+  }
+
+if (isa<Function>(CalledValue->stripPointerCasts()))
+// if (isa<Function>(CalledValue))
+  {
+   errs()<<"A Direct Function Call\n";
+   errs()<<"Fn name: "<<CalledValue->getName()<<"\n"; 
+   return;
+  }
 
   //
   // Second, we will only transform those call sites which are complete (i.e.,
   // for which we know all of the call targets).
   //
-  if (!(CTF->isComplete(CS)))
+  if (!(CTF->isComplete(CS))){
+    errs()<<"Incomplete Call site"<<"\n";
+    errs()<<"Fn name: "<<CalledValue->getName()<<"\n"; 
     return;
+  }
 
   //
   // This is an indirect call site.  Put it in the worklist of call sites to
   // transforms.
   //
+  errs()<<"An Indirect Function Call\n";
+  errs()<<"Fn name: "<<CalledValue->getName()<<"\n"; 
   Worklist.push_back (CS.getInstruction());
   return;
 }
@@ -396,6 +457,9 @@ Devirtualize::visitCallSite (CallSite &CS) {
 //
 bool
 Devirtualize::runOnModule (Module & M) {
+  
+  errs() << "Now in DEVIRTUALIZE PASS -- In runOnModule F \n";
+
   //
   // Get the targets of indirect function calls.
   //
@@ -416,6 +480,8 @@ Devirtualize::runOnModule (Module & M) {
   // Now go through and transform all of the indirect calls that we found that
   // need transforming.
   //
+  errs () << "Number of indirect calls = " << Worklist.size() <<"\n";
+
   for (unsigned index = 0; index < Worklist.size(); ++index) {
     // Autobots, transform (the call site)!
     CallSite CS (Worklist[index]);
