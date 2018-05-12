@@ -44,6 +44,8 @@ bool
 CompleteBUDataStructures::runOnModule (Module &M) {
   init(&getAnalysis<BUDataStructures>(), true, true, false, true);
 
+  errs() << "CompleteBottomUp runOnModule\n";
+
 
   //
   // Make sure we have a DSGraph for all declared functions in the Module.
@@ -102,6 +104,7 @@ CompleteBUDataStructures::buildIndirectFunctionSets (void) {
   // call multiple different functions, we need to unify all of the callees into
   // the same equivalence class.
   //
+  errs()<<"CompleteBUDataStructures::buildIndirectFunctionSets (void)\n";
   DSGraph* G = getGlobalsGraph();
   DSGraph::ScalarMapTy& SM = G->getScalarMap();
 

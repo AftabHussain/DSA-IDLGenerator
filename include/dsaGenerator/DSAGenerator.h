@@ -29,6 +29,7 @@ public:
   virtual bool runOnModule(llvm::Module &m);
 
   virtual void getAnalysisUsage(llvm::AnalysisUsage &AU) const {
+    llvm::errs()<<"[dsagen.h] Adding required passes of BUDataStructures\n";
     AU.addRequired<llvm::BUDataStructures>();
     AU.setPreservesAll();
   }

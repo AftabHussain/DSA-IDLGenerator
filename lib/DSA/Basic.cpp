@@ -33,6 +33,7 @@ X("dsa-basic", "Basic Data Structure Analysis(No Analysis)");
 char BasicDataStructures::ID = 0;
 
 bool BasicDataStructures::runOnModule(Module &M) {
+  errs() << "BasicDataStructures runOnModule\n";
   init(&M.getDataLayout());
 
   //

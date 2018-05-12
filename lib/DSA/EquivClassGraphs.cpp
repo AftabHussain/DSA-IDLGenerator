@@ -40,6 +40,7 @@ char EquivBUDataStructures::ID = 0;
 // in the program.
 //
 bool EquivBUDataStructures::runOnModule(Module &M) {
+  errs()<<"EquivBUDataStructures::runOnModule \n";
   init(&getAnalysis<CompleteBUDataStructures>(), true, true, false, true);
 
   //make a list of all the DSGraphs

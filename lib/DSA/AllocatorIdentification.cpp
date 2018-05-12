@@ -92,6 +92,7 @@ AllocIdentify::AllocIdentify() : ModulePass(ID) {}
 AllocIdentify::~AllocIdentify() {}
 
 bool AllocIdentify::runOnModule(Module& M) {
+  errs() << "AllockIdentify runOnModule\n";
 
   allocators.emplace("malloc");
   allocators.emplace("calloc");

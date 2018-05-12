@@ -1,4 +1,4 @@
-//
+
 // Copyright (c) 2013 Pantazis Deligiannis (p.deligiannis@imperial.ac.uk)
 // This file is distributed under the MIT License. See LICENSE for details.
 //
@@ -71,13 +71,15 @@ int main(int argc, char **argv) {
   ///////////////////////////////
   // initialise and run passes //
   ///////////////////////////////
-
+  errs()<<"[tools-dsagenerator] Initializing and running passes.\n";
   llvm::PassRegistry &Registry = *llvm::PassRegistry::getPassRegistry();
   llvm::initializeAnalysis(Registry);
 
   llvm::legacy::PassManager pass_manager;
 
-//  pass_manager.add(new dsa::DSAGenerator(FunctionsList));
+  //DSAGenerator does not invoke CallTarget Finder
+  pass_manager.add(new dsa::DSAGenerator(FunctionsList));
+  
   pass_manager.add(new llvm::Devirtualize());
   //pass_manager.add(new dsa::UndefinedFunctionsPass(FunctionsList));
    

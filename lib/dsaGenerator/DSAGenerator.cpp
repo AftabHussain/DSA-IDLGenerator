@@ -360,8 +360,8 @@ namespace dsa {
 	}
 
 	bool DSAGenerator::runOnModule(Module &m) {
-
-		/*include/dsaGenerator/DSAGenerator.h +17 //BU Definition
+		errs()<<"[lib-dsagen] Running Pass DSAGenerator \n";
+		/*include/dsaGenerator/DSAGenerator.h +17 //BU Definition //pointer to BUDataStructures
 		https://github.com/llvm-mirror/poolalloc/blob/master/include/dsa/DataStructure.h line 22
 		http://llvm.org/doxygen/classllvm_1_1Pass.html#a4863e5e463fb79955269fbf7fbf52b80
 		BUDataStructures - The analysis that computes the interprocedurally closed
@@ -405,8 +405,9 @@ namespace dsa {
 		std::ofstream undefinedFunctionsFile(m.getName().str() + "_undefined_functions.txt");
 		std::ofstream definedFunctionsFile(m.getName().str() + "_defined_functions.txt");
 
-		/* Unused Code	
-		//std::string functionsListFile = getFunctionsList();
+		// Unused Code	
+		std::string functionsListFile = getFunctionsList();
+		errs()<<"[lib-dsagen]getFunctionsList "<<getFunctionsList()<<" \n";
 		//std::unordered_set<std::string> functions;
 		//functionsListFile is empty, the following is not invoked.
 		/*if(!functionsListFile.empty()) {

@@ -56,10 +56,11 @@ void CallTargetFinder<dsa>::findIndTargets(Module &M)
       for (Function::iterator F = I->begin(), FE = I->end(); F != FE; ++F)
         for (BasicBlock::iterator B = F->begin(), BE = F->end(); B != BE; ++B)
           if (isa<CallInst>(B) || isa<InvokeInst>(B)) {
+	    errs()<<"CallTargets: Found Call instruction\n";
             CallSite cs(dyn_cast<Value>(B));
             AllSites.push_back(cs);
             Function* CF = cs.getCalledFunction();
-
+	    // errs()<<"CallTargets:"<<cs.getCalledFunction()->getName()<<"\n";
             if (isa<UndefValue>(cs.getCalledValue())) continue;
             if (isa<InlineAsm>(cs.getCalledValue())) continue;
 
@@ -115,11 +116,13 @@ void CallTargetFinder<dsa>::findIndTargets(Module &M)
                 } 
                 if (!N->isIncompleteNode() && !N->isExternalNode() && !IndMap[cs].size()) {
                   ++CompleteEmpty;
-                  DEBUG(errs() << "Call site empty: '"
+                  // DEBUG(
+                    errs() << "[CallTargets] Call site empty: '"
                                 << cs.getInstruction()->getName()
                                 << "' In '"
                                 << cs.getInstruction()->getParent()->getParent()->getName()
-                                << "'\n");
+                                << "'\n";
+                                // );
                 }
               }
             } else {
@@ -128,6 +131,7 @@ void CallTargetFinder<dsa>::findIndTargets(Module &M)
               CompleteSites.insert(cs);
             }
           }
+	errs()<<"No. of Direct Calls "<<DirCall<<"\n";
 }
 
   template<class dsa>
@@ -160,6 +164,7 @@ void CallTargetFinder<dsa>::print(llvm::raw_ostream &O, const Module *M) const
 
   template<class dsa>
 bool CallTargetFinder<dsa>::runOnModule(Module &M) {
+  errs()<< "CallTargetFinder - runOnModule\n";
   findIndTargets(M);
   return false;
 }

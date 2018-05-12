@@ -151,8 +151,10 @@ namespace {
     GraphBuilder(Function &f, DSGraph &g, LocalDataStructures& DSi)
       : G(g), FB(&f), DS(&DSi), TD(g.getDataLayout()), VAArray(0) {
 
-      DEBUG(errs() << "[local] Building graph for function: "
-                   << f.getName() << "\n");
+      // DEBUG(
+        errs() << "[local] Building graph for function: "
+                   << f.getName() << "\n";
+                  //  );
 
       // Create scalar nodes for all pointer arguments...
       for (Function::arg_iterator I = f.arg_begin(), E = f.arg_end();
@@ -391,7 +393,9 @@ void GraphBuilder::visitSelectInst(SelectInst &SI) {
 }
 
 void GraphBuilder::visitLoadInst(LoadInst &LI) {
-  DEBUG(errs() << "[local] visiting load: " << LI << "\n");
+  // DEBUG(
+    errs() << "[local] visiting load: " << LI << "\n";
+    // );
   //
   // Create a DSNode for the pointer dereferenced by the load.  If the DSNode
   // is NULL, do nothing more (this can occur if the load is loading from a
@@ -423,7 +427,9 @@ void GraphBuilder::visitLoadInst(LoadInst &LI) {
 }
 
 void GraphBuilder::visitStoreInst(StoreInst &SI) {
-  DEBUG(errs() << "[local] visiting store: " << SI << "\n");
+  // DEBUG(
+    errs() << "[local] visiting store: " << SI << "\n";
+    // );
   Type *StoredTy = SI.getOperand(0)->getType();
   DSNodeHandle Dest = getValueDest(SI.getOperand(1));
   //errs() << "node offset1: " << Dest.getOffset() << "\n";
@@ -535,7 +541,9 @@ void GraphBuilder::visitAtomicRMWInst(AtomicRMWInst &I) {
 }
 
 void GraphBuilder::visitReturnInst(ReturnInst &RI) {
-  DEBUG(errs() << "[local] visiting return: " << RI << "\n");
+  // DEBUG(
+    errs() << "[local] visiting return: " << RI << "\n";
+    // );
   if (RI.getNumOperands() && isa<PointerType>(RI.getOperand(0)->getType()))
     G.getOrCreateReturnNodeFor(*FB).mergeWith(getValueDest(RI.getOperand(0)));
 }
@@ -593,7 +601,9 @@ void GraphBuilder::visitVAArgInst(VAArgInst &I) {
 }
 
 void GraphBuilder::visitIntToPtrInst(IntToPtrInst &I) {
-  DEBUG(errs() << "[local] visiting inttoptr: " << I << "\n");
+  // DEBUG(
+    errs() << "[local] visiting inttoptr: " << I << "\n";
+    // );
   DSNode *N = createNode();
   if(I.hasOneUse()) {
     if(isa<ICmpInst>(*(I.use_begin()))) {
@@ -974,12 +984,16 @@ void GraphBuilder::visitGetElementPtrInst(User &GEP) {
 
 
 void GraphBuilder::visitCallInst(CallInst &CI) {
-  DEBUG(errs() << "[local] visiting call: " << CI << "\n");
+  // DEBUG(
+    errs() << "[local] visiting call: " << CI << "\n";
+    // );
   visitCallSite(&CI);
 }
 
 void GraphBuilder::visitInvokeInst(InvokeInst &II) {
-  DEBUG(errs() << "[local] visiting invoke: " << II << "\n");
+  // DEBUG(
+    errs() << "[local] visiting invoke: " << II << "\n";
+    // );
   visitCallSite(&II);
 }
 
@@ -1532,6 +1546,7 @@ void handleMagicSections(DSGraph* GlobalsGraph, Module& M) {
 char LocalDataStructures::ID;
 
 bool LocalDataStructures::runOnModule(Module &M) {
+  errs() << "LocalDataStructures runOnModule\n";
   init(&M.getDataLayout());
   addrAnalysis = &getAnalysis<AddressTakenAnalysis>();
 

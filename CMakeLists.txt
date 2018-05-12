@@ -126,6 +126,8 @@ target_link_libraries(DSAGenerator dsa assistDS)
 
 target_link_libraries(dsaGenerator dsa DSAGenerator)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 INSTALL(TARGETS dsaGenerator
   RUNTIME DESTINATION bin
 )

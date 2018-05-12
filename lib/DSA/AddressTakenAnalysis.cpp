@@ -35,16 +35,20 @@ using namespace llvm;
 AddressTakenAnalysis::~AddressTakenAnalysis() {}
 
 static bool isAddressTaken(Value* V) {
+   errs()<<"[addresstaken] Checking "<<V->getName()<<"\n";
   for (Value::const_use_iterator I = V->use_begin(), E = V->use_end(); I != E; ++I) {
     User *U = I->getUser();
     if(isa<StoreInst>(U))
-      return true;
+      { errs()<<"true\n";
+        return true;}
+
     if (!isa<CallInst>(U) && !isa<InvokeInst>(U)) {
       if(U->use_empty())
         continue;
       if(isa<GlobalAlias>(U)) {
         if(isAddressTaken(U))
-          return true;
+          { errs()<<"true\n";
+        return true;}
       } else {
         if (Constant *C = dyn_cast<Constant>(U)) {
           if (ConstantExpr *CE = dyn_cast<ConstantExpr>(C)) {
@@ -53,7 +57,8 @@ static bool isAddressTaken(Value* V) {
             }
           }
         }
-        return true;
+        { errs()<<"true\n";
+        return true;}
       }
 
       // FIXME: Can be more robust here for weak aliases that 
@@ -68,10 +73,12 @@ static bool isAddressTaken(Value* V) {
 }
 
 bool AddressTakenAnalysis::runOnModule(llvm::Module& M) {
+  errs() << "[addresstaken] runOnModule\n";
+  //Unclear why this pass is required.
   for (Module::iterator FI = M.begin(), FE = M.end(); FI != FE; ++FI){
     if(isAddressTaken(dyn_cast<Value>(FI))) {
       addressTakenFunctions.insert(&*FI);
-    }
+      }
   }
 
   return false;

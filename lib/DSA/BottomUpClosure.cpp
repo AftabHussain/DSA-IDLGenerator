@@ -46,6 +46,7 @@ char BUDataStructures::ID;
 // program.
 //
 bool BUDataStructures::runOnModule(Module &M) {
+  errs()<<"[bupclosure] - runOnModule\n";
   init(&getAnalysis<StdLibDataStructures>(), true, true, false, false );
 
   return runOnModuleInternal(M);
@@ -310,8 +311,10 @@ BUDataStructures::postOrderInline (Module & M) {
   for (Module::iterator I = M.begin(), E = M.end(); I != E; ++I)
     if (!I->isDeclaration() && !ValMap.count(&*I)) {
       if (MainFunc)
-        DEBUG(errs() << debugname << ": Function unreachable from main: "
-        << I->getName() << "\n");
+       // DEBUG(
+	errs() <<"[bupclosure]" << debugname << ": Function unreachable from main: "
+        << I->getName() << "\n";
+	//);
       calculateGraphs(&*I, Stack, NextID, ValMap);     // Calculate all graphs.
       CloneAuxIntoGlobal(getDSGraph(*I));
 
@@ -434,15 +437,21 @@ BUDataStructures::calculateGraphs (const Function *F,
   // If this is a new SCC, process it now.
   //
   if (Stack.back() == F) {           // Special case the single "SCC" case here.
-    DEBUG(errs() << "Visiting single node SCC #: " << MyID << " fn: "
-	  << F->getName() << "\n");
+  //  DEBUG(
+	errs() << "[bupclosure] Visiting single node SCC #: " << MyID << " fn: "
+	  << F->getName() << "\n";
+//	);
     Stack.pop_back();
-    DEBUG(errs() << "  [BU] Calculating graph for: " << F->getName()<< "\n");
+  //  DEBUG(
+	errs() << "  [bupclosure] Calculating graph for: " << F->getName()<< "\n";
+//	);
     DSGraph* G = getOrCreateGraph(F);
     calculateGraph(G);
-    DEBUG(errs() << "  [BU] Done inlining: " << F->getName() << " ["
+    //DEBUG(
+	errs() << "  [bupclosure] Done inlining: " << F->getName() << " ["
 	  << G->getGraphSize() << "+" << G->getAuxFunctionCalls().size()
-	  << "]\n");
+	  << "]\n";
+	//);
 
     if (MaxSCC < 1) MaxSCC = 1;
 
@@ -453,7 +462,9 @@ BUDataStructures::calculateGraphs (const Function *F,
     getAllAuxCallees(G, NewCallees);
     if (!NewCallees.empty()) {
       if (hasNewCallees(NewCallees, CalleeFunctions)) {
-        DEBUG(errs() << "Recalculating " << F->getName() << " due to new knowledge\n");
+        //DEBUG(
+	errs() << "[bupclosure] Recalculating " << F->getName() << " due to new knowledge\n";
+	//);
         ValMap.erase(F);
         ++NumRecalculations;
         return calculateGraphs(F, Stack, NextID, ValMap);
@@ -538,6 +549,7 @@ BUDataStructures::calculateGraphs (const Function *F,
 //  site in its own list of unresolved call sites.
 //
 void BUDataStructures::CloneAuxIntoGlobal(DSGraph* G) {
+  errs()<<"[bupclosure] CloneAuxIntoGlobal\n";
   //
   // If this DSGraph has no unresolved call sites, do nothing.  We do enough
   // work that wastes time even when the list is empty that this extra check
@@ -624,6 +636,8 @@ void BUDataStructures::CloneAuxIntoGlobal(DSGraph* G) {
 //  dealt with
 //
 void BUDataStructures::calculateGraph(DSGraph* Graph) {
+  errs()<<"[bupclosure] calculateGraph(DSGraph* Graph)\n";
+  errs()<<"[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with\n";
   DEBUG(Graph->AssertGraphOK(); Graph->getGlobalsGraph()->AssertGraphOK());
   Graph->buildCallGraph(callgraph, GlobalFunctionList, filterCallees);
 
@@ -685,11 +699,13 @@ void BUDataStructures::calculateGraph(DSGraph* Graph) {
 
       GI = getDSGraph(*Callee);  // Graph to inline
       DEBUG(GI->AssertGraphOK(); GI->getGlobalsGraph()->AssertGraphOK());
-      DEBUG(errs() << "    Inlining graph for " << Callee->getName()
+      // DEBUG(
+        errs() << "[bottomupclosure]    Inlining graph for " << Callee->getName()
 	    << "[" << GI->getGraphSize() << "+"
 	    << GI->getAuxFunctionCalls().size() << "] into '"
 	    << Graph->getFunctionNames() << "' [" << Graph->getGraphSize() <<"+"
-	    << Graph->getAuxFunctionCalls().size() << "]\n");
+	    << Graph->getAuxFunctionCalls().size() << "]\n";
+      // );
 
       //
       // Merge in the DSGraph of the called function.
@@ -709,6 +725,7 @@ void BUDataStructures::calculateGraph(DSGraph* Graph) {
   TempFCs.clear();
 
   // Recompute the Incomplete markers
+  errs()<<"[bupclosure] Recompute the Incomplete markers\n";
   Graph->maskIncompleteMarkers();
   Graph->markIncompleteNodes(DSGraph::MarkFormalArgs);
   Graph->computeExternalFlags(DSGraph::DontMarkFormalsExternal);
