@@ -1546,7 +1546,7 @@ void handleMagicSections(DSGraph* GlobalsGraph, Module& M) {
 char LocalDataStructures::ID;
 
 bool LocalDataStructures::runOnModule(Module &M) {
-  errs() << "LocalDataStructures runOnModule\n";
+  errs() << "[local] runOnModule\n";
   init(&M.getDataLayout());
   addrAnalysis = &getAnalysis<AddressTakenAnalysis>();
 

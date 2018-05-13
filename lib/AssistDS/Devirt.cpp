@@ -51,6 +51,13 @@ STATISTIC(CSConvert, "Number of call sites converted");
 RegisterPass<Devirtualize>
 XX ("devirt", "Devirtualize indirect function calls");
 
+//Preserving previous passes //to check 
+void getAnalysisUsage(llvm::AnalysisUsage &AU) {
+    AU.setPreservesAll();
+}
+
+
+
 //
 // Function: getVoidPtrType()
 //

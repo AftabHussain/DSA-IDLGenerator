@@ -11,7 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #define DEBUG_TYPE "allocator-identify"
-
+#define MDBG "[alloc-identify] "
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Module.h"
@@ -92,7 +92,7 @@ AllocIdentify::AllocIdentify() : ModulePass(ID) {}
 AllocIdentify::~AllocIdentify() {}
 
 bool AllocIdentify::runOnModule(Module& M) {
-  errs() << "AllockIdentify runOnModule\n";
+  errs() <<MDBG<<"runOnModule\n";
 
   allocators.emplace("malloc");
   allocators.emplace("calloc");
@@ -190,6 +190,7 @@ bool AllocIdentify::runOnModule(Module& M) {
   return false;
 }
 void AllocIdentify::getAnalysisUsage(AnalysisUsage &AU) const {
+  errs()<<MDBG<<"Adding required passes of AllocIdentify: LoopInfoWrapperPass\n";
   AU.addRequired<LoopInfoWrapperPass>();
   AU.setPreservesAll();
 }
