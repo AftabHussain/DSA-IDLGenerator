@@ -1,0 +1,777 @@
+[tools-dsagenerator] Initializing and running passes.
+[dsagen.h] Adding required passes of DsaGenerator: BUDataStructures
+[alloc-identify] Adding required passes of AllocIdentify: LoopInfoWrapperPass
+[addresstaken] runOnModule
+[addresstaken] Checking fn_n
+[addresstaken] Checking llvm.dbg.value
+[addresstaken] Checking main
+[addresstaken] Checking llvm.lifetime.start
+[addresstaken] Checking readAndWriteData
+true
+[addresstaken] Checking mydev_init
+true
+[addresstaken] Checking mydev_uninit
+true
+[addresstaken] Checking readData
+true
+[addresstaken] Checking llvm.lifetime.end
+[addresstaken] Checking reg_device
+[addresstaken] Checking 
+true
+[addresstaken] Checking foobar
+[addresstaken] Checking reg_devops
+[local] runOnModule
+[local] Building graph for function: fn_n
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !33, metadata !131), !dbg !132
+[local] visiting load:   %3 = load i32, i32* %2, align 8, !dbg !134, !tbaa !136
+[local] visiting store:   store i8* %., i8** %1, align 8, !dbg !144
+[local] visiting return:   ret i32 0, !dbg !146
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[local] Building graph for function: main
+[local] visiting call:   call void @llvm.lifetime.start(i64 40, i8* %1) #5, !dbg !131
+[local] visiting store:   store void (%struct.device*, i8*)* bitcast (void (%struct.device.0*, i8*)* @reg_device to void (%struct.device*, i8*)*), void (%struct.device*, i8*)** %2, align 8, !dbg !133, !tbaa !134
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device* %my_printer, i64 0, metadata !38, metadata !153), !dbg !154
+[local] visiting call:   call void bitcast (void (%struct.device.0*, i8*)* @reg_device to void (%struct.device*, i8*)*)(%struct.device* nonnull %my_printer, i8* getelementptr inbounds ([8 x i8], [8 x i8]* @.str.2, i64 0, i64 0)) #5, !dbg !142
+[local] visiting call:   %3 = call i32 @reg_devops(void (%struct.device_operations*)* nonnull @readAndWriteData, %struct.device_operations* bitcast ({ i32 (%struct.packet*)*, void (%struct.device_operations*)*, void (%struct.device_operations*)*, i32 (%struct.device_operations*)*, i32, i8* }* @main.devops to %struct.device_operations*)) #5, !dbg !143
+[local] visiting call:   call void @llvm.lifetime.end(i64 40, i8* %1) #5, !dbg !144
+[local] visiting return:   ret i32 0, !dbg !144
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[local] Building graph for function: readAndWriteData
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !62, metadata !131), !dbg !158
+[local] visiting load:   %2 = load i32, i32* %1, align 8, !dbg !133, !tbaa !135
+[local] visiting store:   store i8* getelementptr inbounds ([11 x i8], [11 x i8]* @.str.1, i64 0, i64 0), i8** %5, align 8, !dbg !145, !tbaa !146
+[local] visiting return:   ret void, !dbg !148
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[local] Building graph for function: mydev_init
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.packet* %p, i64 0, metadata !56, metadata !131), !dbg !169
+[local] visiting store:   store i32 0, i32* %1, align 8, !dbg !134, !tbaa !135
+[local] visiting store:   store i8* null, i8** %2, align 8, !dbg !142, !tbaa !143
+[local] visiting return:   ret i32 1, !dbg !144
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[local] Building graph for function: mydev_uninit
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !59, metadata !131), !dbg !178
+[local] visiting store:   store i32 0, i32* %1, align 8, !dbg !134, !tbaa !135
+[local] visiting return:   ret void, !dbg !141
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[local] Building graph for function: readData
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !65, metadata !131), !dbg !182
+[local] visiting load:   %2 = load i32, i32* %1, align 8, !dbg !133, !tbaa !135
+[local] visiting return:   ret i32 %., !dbg !144
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[local] Building graph for function: reg_device
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device.0* %dev, i64 0, metadata !84, metadata !131), !dbg !189
+[local] visiting call:   tail call void @llvm.dbg.value(metadata i8* %name, i64 0, metadata !85, metadata !131), !dbg !190
+[local] visiting store:   store i8* %name, i8** %1, align 8, !dbg !135, !tbaa !136
+[local] visiting load:   %2 = load i32, i32* getelementptr inbounds (%struct.device_manager, %struct.device_manager* @dm, i64 0, i32 1), align 8, !dbg !142, !tbaa !143
+[local] visiting store:   store i8* %name, i8** %4, align 8, !dbg !147, !tbaa !148
+[local] visiting return:   ret void, !dbg !149
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[local] Building graph for function: foobar
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devop, i64 0, metadata !111, metadata !131), !dbg !201
+[local] visiting store:   store i8* getelementptr inbounds ([10 x i8], [10 x i8]* @.str.3, i64 0, i64 0), i8** %1, align 8, !dbg !134, !tbaa !135
+[local] visiting return:   ret i32 0, !dbg !141
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[local] Building graph for function: reg_devops
+[local] visiting call:   tail call void @llvm.dbg.value(metadata void (%struct.device_operations*)* %fp, i64 0, metadata !116, metadata !131), !dbg !205
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !117, metadata !131), !dbg !206
+[local] visiting call:   tail call void @llvm.dbg.value(metadata i32 (%struct.device_operations*)* @fn_n, i64 0, metadata !118, metadata !131), !dbg !207
+[local] visiting call:   %1 = tail call i32 @fn_n(%struct.device_operations* %devops) #5, !dbg !135
+[local] visiting return:   ret i32 1, !dbg !136
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[alloc-identify] runOnModule
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[bupclosure] - runOnModule
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[bupclosure] Visiting single node SCC #: 3 fn: fn_n
+  [bupclosure] Calculating graph for: fn_n
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: fn_n [2+0]
+[bupclosure] Visiting single node SCC #: 2 fn: reg_devops
+  [bupclosure] Calculating graph for: reg_devops
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bottomupclosure]    Inlining graph for fn_n[2+0] into 'reg_devops' [2+0]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: reg_devops [3+0]
+[bupclosure] Visiting single node SCC #: 4 fn: reg_device
+  [bupclosure] Calculating graph for: reg_device
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: reg_device [3+0]
+[bupclosure] Visiting single node SCC #: 1 fn: main
+  [bupclosure] Calculating graph for: main
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bottomupclosure]    Inlining graph for reg_devops[3+0] into 'main' [8+0]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
+[bottomupclosure]    Inlining graph for reg_device[3+0] into 'main' [9+0]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: main [10+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-bu: Function unreachable from main: readAndWriteData
+[bupclosure] Visiting single node SCC #: 5 fn: readAndWriteData
+  [bupclosure] Calculating graph for: readAndWriteData
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: readAndWriteData [2+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-bu: Function unreachable from main: mydev_init
+[bupclosure] Visiting single node SCC #: 6 fn: mydev_init
+  [bupclosure] Calculating graph for: mydev_init
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: mydev_init [1+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-bu: Function unreachable from main: mydev_uninit
+[bupclosure] Visiting single node SCC #: 7 fn: mydev_uninit
+  [bupclosure] Calculating graph for: mydev_uninit
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: mydev_uninit [1+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-bu: Function unreachable from main: readData
+[bupclosure] Visiting single node SCC #: 8 fn: readData
+  [bupclosure] Calculating graph for: readData
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: readData [1+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-bu: Function unreachable from main: foobar
+[bupclosure] Visiting single node SCC #: 9 fn: foobar
+  [bupclosure] Calculating graph for: foobar
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: foobar [2+0]
+[bupclosure] CloneAuxIntoGlobal
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[lib-dsagen] Running Pass DSAGenerator 
+[lib-dsagen]getFunctionsList  
+Scanning Function {fn_n}
+a defined function{fn_n}
+Scanning argument {devops}
+0 = arg -->devops
+isglobal: 0-------------------
+arg.getArgNo(){0}
+F.getName(){fn_n}
+## Function ## : fn_n | argsize: 1 :: Requested 1
+<0x16a6710> = distinct !DISubprogram(name: "fn_n", scope: <0x169fbb0>, file: <0x169fbb0>, line: 44, type: <0x16a4640>, isLocal: false, isDefinition: true, scopeLine: 44, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16a4a98>) value of the metadata
+type information: 0x16a33d8type information: 0x16a4448type information: 0x16a4448type information: 0x16a5478type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+	offset : 0	 | name : devops
+	offset : 8	 | name : dop_uninit
+	offset : 16	 | name : dop_read_write
+	offset : 24	 | name : dop_read
+	offset : 32	 | name : devop_init_registered
+	offset : 40	 | name : device_info
+-------------------------------------------
+checking ii ei
+32 1
+<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+check type nameintchecking ii ei
+40 1
+<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+check type namecheck type namechar-------------------------------------------
+	offset : 0	 | name : devops
+-------------------------------------------
+Scanning Function {llvm.dbg.value}
+Scanning Function {main}
+a defined function{main}
+Scanning Function {llvm.lifetime.start}
+Scanning Function {readAndWriteData}
+a defined function{readAndWriteData}
+Scanning argument {devops}
+0 = arg -->devops
+isglobal: 0-------------------
+arg.getArgNo(){0}
+F.getName(){readAndWriteData}
+## Function ## : readAndWriteData | argsize: 1 :: Requested 1
+<0x16aa4b0> = distinct !DISubprogram(name: "readAndWriteData", scope: <0x169fbb0>, file: <0x169fbb0>, line: 37, type: <0x16a4350>, isLocal: true, isDefinition: true, scopeLine: 37, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16aa3a8>) value of the metadata
+return type "void" for Function : readAndWriteData
+type information: 0x16a33d8type information: 0x16a4448type information: 0x16a4448type information: 0x16a5478type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+	offset : 0	 | name : devops
+	offset : 8	 | name : dop_uninit
+	offset : 16	 | name : dop_read_write
+	offset : 24	 | name : dop_read
+	offset : 32	 | name : devop_init_registered
+	offset : 40	 | name : device_info
+-------------------------------------------
+checking ii ei
+32 1
+<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+check type nameintchecking ii ei
+40 1
+<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+check type namecheck type namechar-------------------------------------------
+	offset : 0	 | name : devops
+-------------------------------------------
+Scanning Function {mydev_init}
+a defined function{mydev_init}
+Scanning argument {p}
+0 = arg -->p
+isglobal: 0-------------------
+arg.getArgNo(){0}
+F.getName(){mydev_init}
+## Function ## : mydev_init | argsize: 1 :: Requested 1
+<0x16a93f0> = distinct !DISubprogram(name: "mydev_init", scope: <0x169fbb0>, file: <0x169fbb0>, line: 8, type: <0x16a30d0>, isLocal: true, isDefinition: true, scopeLine: 8, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16a8b38>) value of the metadata
+type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+	offset : 0	 | name : p
+	offset : 8	 | name : data
+-------------------------------------------
+checking ii ei
+0 0
+checking ii ei
+0 2
+<0x16a2e38> = !DIBasicType(name: "char", size: 8, align: 8, encoding: DW_ATE_signed_char)
+check type namechar<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+check type namecheck type namecharScanning Function {mydev_uninit}
+a defined function{mydev_uninit}
+Scanning argument {devops}
+0 = arg -->devops
+isglobal: 0-------------------
+arg.getArgNo(){0}
+F.getName(){mydev_uninit}
+## Function ## : mydev_uninit | argsize: 1 :: Requested 1
+<0x16a9c70> = distinct !DISubprogram(name: "mydev_uninit", scope: <0x169fbb0>, file: <0x169fbb0>, line: 15, type: <0x16a4350>, isLocal: true, isDefinition: true, scopeLine: 15, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16a9b68>) value of the metadata
+return type "void" for Function : mydev_uninit
+type information: 0x16a33d8type information: 0x16a4448type information: 0x16a4448type information: 0x16a5478type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+	offset : 0	 | name : devops
+	offset : 8	 | name : dop_uninit
+	offset : 16	 | name : dop_read_write
+	offset : 24	 | name : dop_read
+	offset : 32	 | name : devop_init_registered
+	offset : 40	 | name : device_info
+-------------------------------------------
+checking ii ei
+0 0
+checking ii ei
+32 1
+<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+check type nameintScanning Function {readData}
+a defined function{readData}
+Scanning argument {devops}
+0 = arg -->devops
+isglobal: 0-------------------
+arg.getArgNo(){0}
+F.getName(){readData}
+## Function ## : readData | argsize: 1 :: Requested 1
+<0x16aa740> = distinct !DISubprogram(name: "readData", scope: <0x169fbb0>, file: <0x169fbb0>, line: 20, type: <0x16a4640>, isLocal: true, isDefinition: true, scopeLine: 20, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16a9a48>) value of the metadata
+type information: 0x16a33d8type information: 0x16a4448type information: 0x16a4448type information: 0x16a5478type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+	offset : 0	 | name : devops
+	offset : 8	 | name : dop_uninit
+	offset : 16	 | name : dop_read_write
+	offset : 24	 | name : dop_read
+	offset : 32	 | name : devop_init_registered
+	offset : 40	 | name : device_info
+-------------------------------------------
+checking ii ei
+32 1
+<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+check type nameintchecking ii ei
+0 0
+Scanning Function {llvm.lifetime.end}
+Scanning Function {reg_device}
+a defined function{reg_device}
+Scanning argument {dev}
+0 = arg -->dev
+isglobal: 0-------------------
+arg.getArgNo(){0}
+F.getName(){reg_device}
+## Function ## : reg_device | argsize: 2 :: Requested 1
+<0x16ab830> = distinct !DISubprogram(name: "reg_device", scope: <0x16ab070>, file: <0x16ab070>, line: 22, type: <0x16ab430>, isLocal: false, isDefinition: true, scopeLine: 22, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16ab0a0>) value of the metadata
+return type "void" for Function : reg_device
+type information: 0x16a2ea8type information: 0x16a7260type information: 0x16aba48type information: 0x16a4148type information: 0x16a4148-------------------------------------------
+	offset : 0	 | name : dev
+	offset : 8	 | name : status
+	offset : 24	 | name : set_device
+	offset : 32	 | name : id
+	offset : 36	 | name : system_id
+-------------------------------------------
+checking ii ei
+0 0
+checking ii ei
+0 1
+<0x16a4148> = !DIBasicType(name: "float", size: 32, align: 32, encoding: DW_ATE_float)
+check type namefloat-------------------------------------------
+	offset : 0	 | name : dev
+-------------------------------------------
+Scanning argument {name}
+1 = arg -->name
+isglobal: 1-------------------
+Scanning Function {foobar}
+a defined function{foobar}
+Scanning argument {devop}
+0 = arg -->devop
+isglobal: 0-------------------
+arg.getArgNo(){0}
+F.getName(){foobar}
+## Function ## : foobar | argsize: 1 :: Requested 1
+<0x16b0280> = distinct !DISubprogram(name: "foobar", scope: <0x16ab070>, file: <0x16ab070>, line: 42, type: <0x16a2c60>, isLocal: false, isDefinition: true, scopeLine: 42, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16b0178>) value of the metadata
+type information: 0x16ad888type information: 0x16adcf8type information: 0x16adcf8type information: 0x16af2e8type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+	offset : 0	 | name : devop
+	offset : 8	 | name : dop_uninit
+	offset : 16	 | name : dop_read_write
+	offset : 24	 | name : dop_read
+	offset : 32	 | name : devop_init_registered
+	offset : 40	 | name : device_info
+-------------------------------------------
+checking ii ei
+0 0
+checking ii ei
+40 1
+<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+check type namecheck type namechar-------------------------------------------
+	offset : 0	 | name : devop
+-------------------------------------------
+Scanning Function {reg_devops}
+a defined function{reg_devops}
+Scanning argument {fp}
+0 = arg -->fp
+isglobal: 0-------------------
+arg.getArgNo(){0}
+F.getName(){reg_devops}
+## Function ## : reg_devops | argsize: 2 :: Requested 1
+<0x16b1ab0> = distinct !DISubprogram(name: "reg_devops", scope: <0x16ab070>, file: <0x16ab070>, line: 59, type: <0x16af280>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16ab888>) value of the metadata
+-------------------------------------------
+-------------------------------------------
+Scanning argument {devops}
+1 = arg -->devops
+isglobal: 0-------------------
+arg.getArgNo(){1}
+F.getName(){reg_devops}
+## Function ## : reg_devops | argsize: 2 :: Requested 2
+<0x16b1ab0> = distinct !DISubprogram(name: "reg_devops", scope: <0x16ab070>, file: <0x16ab070>, line: 59, type: <0x16af280>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16ab888>) value of the metadata
+type information: 0x16ad888type information: 0x16adcf8type information: 0x16adcf8type information: 0x16af2e8type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+	offset : 0	 | name : devops
+	offset : 8	 | name : dop_uninit
+	offset : 16	 | name : dop_read_write
+	offset : 24	 | name : dop_read
+	offset : 32	 | name : devop_init_registered
+	offset : 40	 | name : device_info
+-------------------------------------------
+checking ii ei
+32 1
+<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+check type nameintchecking ii ei
+40 1
+<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+check type namecheck type namechar-------------------------------------------
+	offset : 0	 | name : devops
+-------------------------------------------
+type information: 0x16a33d8type information: 0x16a4448type information: 0x16a4448type information: 0x16a5478type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+	offset : 0	 | name : devops
+	offset : 8	 | name : dop_uninit
+	offset : 16	 | name : dop_read_write
+	offset : 24	 | name : dop_read
+	offset : 32	 | name : devop_init_registered
+	offset : 40	 | name : device_info
+-------------------------------------------
+name: devops-------------
+is global: 1---------------
+checking ii ei
+32 1
+<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+check type nameintchecking ii ei
+40 1
+<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+check type namecheck type namechar-------------------------------------------
+	offset : 0	 | name : devops
+-------------------------------------------
+-------------------------------------------
+-------------------------------------------
+-------------------------------------------
+-------------------------------------------
+-------------------------------------------
+-------------------------------------------
+-------------------------------------------
+	offset : 0	 | name : devops
+-------------------------------------------
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+CompleteBottomUp runOnModule
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+CompleteBUDataStructures::buildIndirectFunctionSets (void)
+[bupclosure] Visiting single node SCC #: 3 fn: fn_n
+  [bupclosure] Calculating graph for: fn_n
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: fn_n [2+0]
+[bupclosure] Visiting single node SCC #: 2 fn: reg_devops
+  [bupclosure] Calculating graph for: reg_devops
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bottomupclosure]    Inlining graph for fn_n[2+0] into 'reg_devops' [3+0]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: reg_devops [3+0]
+[bupclosure] Visiting single node SCC #: 4 fn: reg_device
+  [bupclosure] Calculating graph for: reg_device
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: reg_device [3+0]
+[bupclosure] Visiting single node SCC #: 1 fn: main
+  [bupclosure] Calculating graph for: main
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bottomupclosure]    Inlining graph for reg_devops[3+0] into 'main' [10+0]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
+[bottomupclosure]    Inlining graph for reg_device[3+0] into 'main' [10+0]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: main [10+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-cbu: Function unreachable from main: readAndWriteData
+[bupclosure] Visiting single node SCC #: 5 fn: readAndWriteData
+  [bupclosure] Calculating graph for: readAndWriteData
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: readAndWriteData [2+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-cbu: Function unreachable from main: mydev_init
+[bupclosure] Visiting single node SCC #: 6 fn: mydev_init
+  [bupclosure] Calculating graph for: mydev_init
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: mydev_init [1+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-cbu: Function unreachable from main: mydev_uninit
+[bupclosure] Visiting single node SCC #: 7 fn: mydev_uninit
+  [bupclosure] Calculating graph for: mydev_uninit
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: mydev_uninit [1+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-cbu: Function unreachable from main: readData
+[bupclosure] Visiting single node SCC #: 8 fn: readData
+  [bupclosure] Calculating graph for: readData
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: readData [1+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-cbu: Function unreachable from main: foobar
+[bupclosure] Visiting single node SCC #: 9 fn: foobar
+  [bupclosure] Calculating graph for: foobar
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: foobar [2+0]
+[bupclosure] CloneAuxIntoGlobal
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+EquivBUDataStructures::runOnModule 
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+CompleteBUDataStructures::buildIndirectFunctionSets (void)
+[bupclosure] Visiting single node SCC #: 3 fn: fn_n
+  [bupclosure] Calculating graph for: fn_n
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: fn_n [2+0]
+[bupclosure] Visiting single node SCC #: 2 fn: reg_devops
+  [bupclosure] Calculating graph for: reg_devops
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bottomupclosure]    Inlining graph for fn_n[2+0] into 'reg_devops' [3+0]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: reg_devops [3+0]
+[bupclosure] Visiting single node SCC #: 4 fn: reg_device
+  [bupclosure] Calculating graph for: reg_device
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: reg_device [3+0]
+[bupclosure] Visiting single node SCC #: 1 fn: main
+  [bupclosure] Calculating graph for: main
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bottomupclosure]    Inlining graph for reg_devops[3+0] into 'main' [10+0]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
+[bottomupclosure]    Inlining graph for reg_device[3+0] into 'main' [10+0]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: main [10+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-eq: Function unreachable from main: readAndWriteData
+[bupclosure] Visiting single node SCC #: 5 fn: readAndWriteData
+  [bupclosure] Calculating graph for: readAndWriteData
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: readAndWriteData [2+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-eq: Function unreachable from main: mydev_init
+[bupclosure] Visiting single node SCC #: 6 fn: mydev_init
+  [bupclosure] Calculating graph for: mydev_init
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: mydev_init [1+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-eq: Function unreachable from main: mydev_uninit
+[bupclosure] Visiting single node SCC #: 7 fn: mydev_uninit
+  [bupclosure] Calculating graph for: mydev_uninit
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: mydev_uninit [1+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-eq: Function unreachable from main: readData
+[bupclosure] Visiting single node SCC #: 8 fn: readData
+  [bupclosure] Calculating graph for: readData
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: readData [1+0]
+[bupclosure] CloneAuxIntoGlobal
+[bupclosure]dsa-eq: Function unreachable from main: foobar
+[bupclosure] Visiting single node SCC #: 9 fn: foobar
+  [bupclosure] Calculating graph for: foobar
+[bupclosure] calculateGraph(DSGraph* Graph)
+[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[bupclosure] Recompute the Incomplete markers
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+  [bupclosure] Done inlining: foobar [2+0]
+[bupclosure] CloneAuxIntoGlobal
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+TopDownClosure runOnModule
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[TD] Inlining callers into 'foobar'
+[TD] Inlining callers into 'readData'
+[TD] Inlining callers into 'mydev_uninit'
+[TD] Inlining callers into 'mydev_init'
+[TD] Inlining callers into 'readAndWriteData'
+[TD] Inlining callers into 'main'
+[TD] Inlining callers into 'reg_device'
+   [TD] Inlining graph into Fn 'reg_device' from [TD] Fn 'main'[TD] : 2 args
+[TD] Inlining callers into 'reg_devops'
+   [TD] Inlining graph into Fn 'reg_devops' from [TD] Fn 'main'[TD] : 2 args
+[TD] Inlining callers into 'fn_n'
+   [TD] Inlining graph into Fn 'fn_n' from [TD] Fn 'reg_devops'[TD] : 1 args
+CallTargetFinder - runOnModule
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+CallTargets: Found Call instruction
+No. of Direct Calls 0
+Now in DEVIRTUALIZE PASS -- In runOnModule F 
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+A Direct Function Call
+Fn name: 
+--- Fn visitCallSite ---
+A Direct Function Call
+Fn name: reg_devops
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+ignoring llvm lib fn
+--- Fn visitCallSite ---
+A Direct Function Call
+Fn name: fn_n
+Number of indirect calls = 0
