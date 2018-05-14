@@ -18,6 +18,7 @@
 //===----------------------------------------------------------------------===//
 
 #define DEBUG_TYPE "call-targets"
+
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Instructions.h"
 #include "dsa/DataStructure.h"
@@ -56,7 +57,7 @@ void CallTargetFinder<dsa>::findIndTargets(Module &M)
       for (Function::iterator F = I->begin(), FE = I->end(); F != FE; ++F)
         for (BasicBlock::iterator B = F->begin(), BE = F->end(); B != BE; ++B)
           if (isa<CallInst>(B) || isa<InvokeInst>(B)) {
-	    errs()<<"CallTargets: Found Call instruction\n";
+	    errs()<<"[call-targs] Found Call instruction\n";
             CallSite cs(dyn_cast<Value>(B));
             AllSites.push_back(cs);
             Function* CF = cs.getCalledFunction();
@@ -131,7 +132,7 @@ void CallTargetFinder<dsa>::findIndTargets(Module &M)
               CompleteSites.insert(cs);
             }
           }
-	errs()<<"No. of Direct Calls "<<DirCall<<"\n";
+	errs()<<"[call-targs] No. of Direct Calls "<<DirCall<<"\n";
 }
 
   template<class dsa>
@@ -164,7 +165,7 @@ void CallTargetFinder<dsa>::print(llvm::raw_ostream &O, const Module *M) const
 
   template<class dsa>
 bool CallTargetFinder<dsa>::runOnModule(Module &M) {
-  errs()<< "CallTargetFinder - runOnModule\n";
+  errs()<< "[call-targs] runOnModule\n";
   findIndTargets(M);
   return false;
 }

@@ -60,6 +60,7 @@ int main(int argc, char **argv) {
   llvm::EnableDebugBuffering = true;
 
   llvm::SMDiagnostic err;
+  errs()<<"[tools-dsagenerator] parsing input file.\n";
   std::unique_ptr<llvm::Module> module = llvm::parseIRFile(InputFilename, err, llvm::getGlobalContext());
   if (!err.getMessage().empty())
     check("Problem reading input bitcode/IR: " + err.getMessage().str());
@@ -71,18 +72,23 @@ int main(int argc, char **argv) {
   ///////////////////////////////
   // initialise and run passes //
   ///////////////////////////////
-  errs()<<"[tools-dsagenerator] Initializing and running passes.\n";
+  errs()<<"[tools-dsagenerator] Initializing pass registry.\n";
   llvm::PassRegistry &Registry = *llvm::PassRegistry::getPassRegistry();
   llvm::initializeAnalysis(Registry);
 
   llvm::legacy::PassManager pass_manager;
 
+  errs()<<"[tools-dsagenerator] Adding DSAGenerator to pass manager.\n";
   //DSAGenerator does not invoke CallTarget Finder
   pass_manager.add(new dsa::DSAGenerator(FunctionsList));
-  
+
+
+  errs()<<"[tools-dsagenerator] Adding Devirt to pass manager.\n";  
   pass_manager.add(new llvm::Devirtualize());
   //pass_manager.add(new dsa::UndefinedFunctionsPass(FunctionsList));
-   
+
+
+  errs()<<"[tools-dsagenerator] Running Passes.\n"; 
   pass_manager.run(*module.get());
 
   return 0;

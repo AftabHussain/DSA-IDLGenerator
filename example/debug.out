@@ -1,6 +1,17 @@
-[tools-dsagenerator] Initializing and running passes.
-[dsagen.h] Adding required passes of DsaGenerator: BUDataStructures
+[tools-dsagenerator] parsing input file.
+[tools-dsagenerator] Initializing pass registry.
+[tools-dsagenerator] Adding DSAGenerator to pass manager.
+[dsagen.h] Adding required passes of dsaGenerator: BUDataStructures
+[ds.h] adding required pass of BUDataStructures: StdLibDataStructures
+[ds.h] adding required pass of StdLibDataStructures: LocalDataStructures and AllocIdentify
+[ds.h] adding required pass of DataStructures: AddressTakenAnalysis
 [alloc-identify] Adding required passes of AllocIdentify: LoopInfoWrapperPass
+[tools-dsagenerator] Adding Devirt to pass manager.
+[devirt.h] adding required pass for devirt: EQTDDataStructures
+[ds.h] Adding required pass of TDDataStructures: EquivBUDataStructures
+[ds.h] Adding required pass of EquivBUDataStructures: CompleteBUDataStructures
+[ds.h] adding required pass of CompleteBUDataStructures, BUDataStructures
+[tools-dsagenerator] Running Passes.
 [addresstaken] runOnModule
 [addresstaken] Checking fn_n
 [addresstaken] Checking llvm.dbg.value
@@ -21,6 +32,7 @@ true
 [addresstaken] Checking foobar
 [addresstaken] Checking reg_devops
 [local] runOnModule
+[local] adding required pass of Local: AddressTakenAnalysis 
 [local] Building graph for function: fn_n
 [local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !33, metadata !131), !dbg !132
 [local] visiting load:   %3 = load i32, i32* %2, align 8, !dbg !134, !tbaa !136
@@ -79,6 +91,7 @@ true
 [local] visiting return:   ret i32 1, !dbg !136
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
 [alloc-identify] runOnModule
+[stdlib-ds] runOnModule
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
@@ -220,8 +233,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){fn_n}
 ## Function ## : fn_n | argsize: 1 :: Requested 1
-<0x16a6710> = distinct !DISubprogram(name: "fn_n", scope: <0x169fbb0>, file: <0x169fbb0>, line: 44, type: <0x16a4640>, isLocal: false, isDefinition: true, scopeLine: 44, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16a4a98>) value of the metadata
-type information: 0x16a33d8type information: 0x16a4448type information: 0x16a4448type information: 0x16a5478type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+<0x1eda710> = distinct !DISubprogram(name: "fn_n", scope: <0x1ed3bb0>, file: <0x1ed3bb0>, line: 44, type: <0x1ed8640>, isLocal: false, isDefinition: true, scopeLine: 44, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1ed8a98>) value of the metadata
+type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed8448type information: 0x1ed9478type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -231,10 +244,10 @@ type information: 0x16a33d8type information: 0x16a4448type information: 0x16a444
 -------------------------------------------
 checking ii ei
 32 1
-<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintchecking ii ei
 40 1
-<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
@@ -250,9 +263,9 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){readAndWriteData}
 ## Function ## : readAndWriteData | argsize: 1 :: Requested 1
-<0x16aa4b0> = distinct !DISubprogram(name: "readAndWriteData", scope: <0x169fbb0>, file: <0x169fbb0>, line: 37, type: <0x16a4350>, isLocal: true, isDefinition: true, scopeLine: 37, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16aa3a8>) value of the metadata
+<0x1ede4b0> = distinct !DISubprogram(name: "readAndWriteData", scope: <0x1ed3bb0>, file: <0x1ed3bb0>, line: 37, type: <0x1ed8350>, isLocal: true, isDefinition: true, scopeLine: 37, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1ede3a8>) value of the metadata
 return type "void" for Function : readAndWriteData
-type information: 0x16a33d8type information: 0x16a4448type information: 0x16a4448type information: 0x16a5478type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed8448type information: 0x1ed9478type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -262,10 +275,10 @@ type information: 0x16a33d8type information: 0x16a4448type information: 0x16a444
 -------------------------------------------
 checking ii ei
 32 1
-<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintchecking ii ei
 40 1
-<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
@@ -277,8 +290,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){mydev_init}
 ## Function ## : mydev_init | argsize: 1 :: Requested 1
-<0x16a93f0> = distinct !DISubprogram(name: "mydev_init", scope: <0x169fbb0>, file: <0x169fbb0>, line: 8, type: <0x16a30d0>, isLocal: true, isDefinition: true, scopeLine: 8, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16a8b38>) value of the metadata
-type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+<0x1edd3f0> = distinct !DISubprogram(name: "mydev_init", scope: <0x1ed3bb0>, file: <0x1ed3bb0>, line: 8, type: <0x1ed70d0>, isLocal: true, isDefinition: true, scopeLine: 8, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1edcb38>) value of the metadata
+type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
 	offset : 0	 | name : p
 	offset : 8	 | name : data
 -------------------------------------------
@@ -286,8 +299,8 @@ checking ii ei
 0 0
 checking ii ei
 0 2
-<0x16a2e38> = !DIBasicType(name: "char", size: 8, align: 8, encoding: DW_ATE_signed_char)
-check type namechar<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+<0x1ed6e38> = !DIBasicType(name: "char", size: 8, align: 8, encoding: DW_ATE_signed_char)
+check type namechar<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
 check type namecheck type namecharScanning Function {mydev_uninit}
 a defined function{mydev_uninit}
 Scanning argument {devops}
@@ -296,9 +309,9 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){mydev_uninit}
 ## Function ## : mydev_uninit | argsize: 1 :: Requested 1
-<0x16a9c70> = distinct !DISubprogram(name: "mydev_uninit", scope: <0x169fbb0>, file: <0x169fbb0>, line: 15, type: <0x16a4350>, isLocal: true, isDefinition: true, scopeLine: 15, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16a9b68>) value of the metadata
+<0x1eddc70> = distinct !DISubprogram(name: "mydev_uninit", scope: <0x1ed3bb0>, file: <0x1ed3bb0>, line: 15, type: <0x1ed8350>, isLocal: true, isDefinition: true, scopeLine: 15, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1eddb68>) value of the metadata
 return type "void" for Function : mydev_uninit
-type information: 0x16a33d8type information: 0x16a4448type information: 0x16a4448type information: 0x16a5478type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed8448type information: 0x1ed9478type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -310,7 +323,7 @@ checking ii ei
 0 0
 checking ii ei
 32 1
-<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintScanning Function {readData}
 a defined function{readData}
 Scanning argument {devops}
@@ -319,8 +332,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){readData}
 ## Function ## : readData | argsize: 1 :: Requested 1
-<0x16aa740> = distinct !DISubprogram(name: "readData", scope: <0x169fbb0>, file: <0x169fbb0>, line: 20, type: <0x16a4640>, isLocal: true, isDefinition: true, scopeLine: 20, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16a9a48>) value of the metadata
-type information: 0x16a33d8type information: 0x16a4448type information: 0x16a4448type information: 0x16a5478type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+<0x1ede740> = distinct !DISubprogram(name: "readData", scope: <0x1ed3bb0>, file: <0x1ed3bb0>, line: 20, type: <0x1ed8640>, isLocal: true, isDefinition: true, scopeLine: 20, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1edda48>) value of the metadata
+type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed8448type information: 0x1ed9478type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -330,7 +343,7 @@ type information: 0x16a33d8type information: 0x16a4448type information: 0x16a444
 -------------------------------------------
 checking ii ei
 32 1
-<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintchecking ii ei
 0 0
 Scanning Function {llvm.lifetime.end}
@@ -342,9 +355,9 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){reg_device}
 ## Function ## : reg_device | argsize: 2 :: Requested 1
-<0x16ab830> = distinct !DISubprogram(name: "reg_device", scope: <0x16ab070>, file: <0x16ab070>, line: 22, type: <0x16ab430>, isLocal: false, isDefinition: true, scopeLine: 22, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16ab0a0>) value of the metadata
+<0x1edf830> = distinct !DISubprogram(name: "reg_device", scope: <0x1edf070>, file: <0x1edf070>, line: 22, type: <0x1edf430>, isLocal: false, isDefinition: true, scopeLine: 22, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1edf0a0>) value of the metadata
 return type "void" for Function : reg_device
-type information: 0x16a2ea8type information: 0x16a7260type information: 0x16aba48type information: 0x16a4148type information: 0x16a4148-------------------------------------------
+type information: 0x1ed6ea8type information: 0x1edb260type information: 0x1edfa48type information: 0x1ed8148type information: 0x1ed8148-------------------------------------------
 	offset : 0	 | name : dev
 	offset : 8	 | name : status
 	offset : 24	 | name : set_device
@@ -355,7 +368,7 @@ checking ii ei
 0 0
 checking ii ei
 0 1
-<0x16a4148> = !DIBasicType(name: "float", size: 32, align: 32, encoding: DW_ATE_float)
+<0x1ed8148> = !DIBasicType(name: "float", size: 32, align: 32, encoding: DW_ATE_float)
 check type namefloat-------------------------------------------
 	offset : 0	 | name : dev
 -------------------------------------------
@@ -370,8 +383,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){foobar}
 ## Function ## : foobar | argsize: 1 :: Requested 1
-<0x16b0280> = distinct !DISubprogram(name: "foobar", scope: <0x16ab070>, file: <0x16ab070>, line: 42, type: <0x16a2c60>, isLocal: false, isDefinition: true, scopeLine: 42, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16b0178>) value of the metadata
-type information: 0x16ad888type information: 0x16adcf8type information: 0x16adcf8type information: 0x16af2e8type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+<0x1ee2880> = distinct !DISubprogram(name: "foobar", scope: <0x1edf070>, file: <0x1edf070>, line: 42, type: <0x1ee2530>, isLocal: false, isDefinition: true, scopeLine: 42, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1ee2778>) value of the metadata
+type information: 0x1ee1888type information: 0x1ee1cf8type information: 0x1ee1cf8type information: 0x1ee32e8type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
 	offset : 0	 | name : devop
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -383,7 +396,7 @@ checking ii ei
 0 0
 checking ii ei
 40 1
-<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devop
 -------------------------------------------
@@ -395,7 +408,7 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){reg_devops}
 ## Function ## : reg_devops | argsize: 2 :: Requested 1
-<0x16b1ab0> = distinct !DISubprogram(name: "reg_devops", scope: <0x16ab070>, file: <0x16ab070>, line: 59, type: <0x16af280>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16ab888>) value of the metadata
+<0x1ee5ac0> = distinct !DISubprogram(name: "reg_devops", scope: <0x1edf070>, file: <0x1edf070>, line: 59, type: <0x1ee28e0>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1edf888>) value of the metadata
 -------------------------------------------
 -------------------------------------------
 Scanning argument {devops}
@@ -404,8 +417,8 @@ isglobal: 0-------------------
 arg.getArgNo(){1}
 F.getName(){reg_devops}
 ## Function ## : reg_devops | argsize: 2 :: Requested 2
-<0x16b1ab0> = distinct !DISubprogram(name: "reg_devops", scope: <0x16ab070>, file: <0x16ab070>, line: 59, type: <0x16af280>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x16ab888>) value of the metadata
-type information: 0x16ad888type information: 0x16adcf8type information: 0x16adcf8type information: 0x16af2e8type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+<0x1ee5ac0> = distinct !DISubprogram(name: "reg_devops", scope: <0x1edf070>, file: <0x1edf070>, line: 59, type: <0x1ee28e0>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1edf888>) value of the metadata
+type information: 0x1ee1888type information: 0x1ee1cf8type information: 0x1ee1cf8type information: 0x1ee32e8type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -415,14 +428,14 @@ type information: 0x16ad888type information: 0x16adcf8type information: 0x16adcf
 -------------------------------------------
 checking ii ei
 32 1
-<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintchecking ii ei
 40 1
-<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
-type information: 0x16a33d8type information: 0x16a4448type information: 0x16a4448type information: 0x16a5478type information: 0x169a568type information: 0x16a2ea8-------------------------------------------
+type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed8448type information: 0x1ed9478type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -434,10 +447,10 @@ name: devops-------------
 is global: 1---------------
 checking ii ei
 32 1
-<0x169a568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintchecking ii ei
 40 1
-<0x16a2ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x16a2e38>, size: 64, align: 64)
+<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
@@ -451,7 +464,7 @@ check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
 [dsgraph] cloneInto - Cloning DSGraph into current graph
-CompleteBottomUp runOnModule
+[complete-bup] runOnModule
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
@@ -461,7 +474,7 @@ CompleteBottomUp runOnModule
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
-CompleteBUDataStructures::buildIndirectFunctionSets (void)
+[complete-bup] buildIndirectFunctionSets (void)
 [bupclosure] Visiting single node SCC #: 3 fn: fn_n
   [bupclosure] Calculating graph for: fn_n
 [bupclosure] calculateGraph(DSGraph* Graph)
@@ -572,7 +585,7 @@ CompleteBUDataStructures::buildIndirectFunctionSets (void)
 [dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
 [dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
 [dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
-EquivBUDataStructures::runOnModule 
+[equ-class-graphs] runOnModule 
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
@@ -583,7 +596,7 @@ EquivBUDataStructures::runOnModule
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
-CompleteBUDataStructures::buildIndirectFunctionSets (void)
+[complete-bup] buildIndirectFunctionSets (void)
 [bupclosure] Visiting single node SCC #: 3 fn: fn_n
   [bupclosure] Calculating graph for: fn_n
 [bupclosure] calculateGraph(DSGraph* Graph)
@@ -694,7 +707,7 @@ CompleteBUDataStructures::buildIndirectFunctionSets (void)
 [dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
 [dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
 [dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
-TopDownClosure runOnModule
+[TD] runOnModule | useEQBE val 1 
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
@@ -717,61 +730,62 @@ TopDownClosure runOnModule
    [TD] Inlining graph into Fn 'reg_devops' from [TD] Fn 'main'[TD] : 2 args
 [TD] Inlining callers into 'fn_n'
    [TD] Inlining graph into Fn 'fn_n' from [TD] Fn 'reg_devops'[TD] : 1 args
-CallTargetFinder - runOnModule
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-CallTargets: Found Call instruction
-No. of Direct Calls 0
-Now in DEVIRTUALIZE PASS -- In runOnModule F 
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-A Direct Function Call
-Fn name: 
---- Fn visitCallSite ---
-A Direct Function Call
-Fn name: reg_devops
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-ignoring llvm lib fn
---- Fn visitCallSite ---
-A Direct Function Call
-Fn name: fn_n
-Number of indirect calls = 0
+[call-targs] runOnModule
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] Found Call instruction
+[call-targs] No. of Direct Calls 0
+[devirt] runOnModule 
+[devirt] adding required pass of Devirt: EQTDDataStructures
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] A Direct Function Call
+[devirt] Fn name: 
+[devirt] visitCallSite 
+[devirt] A Direct Function Call
+[devirt] Fn name: reg_devops
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] A Direct Function Call
+[devirt] Fn name: fn_n
+[devirt] Number of indirect calls = 0

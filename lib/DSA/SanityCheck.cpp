@@ -118,7 +118,7 @@ SanityCheck::checkLoad (LoadInst & LI) {
 //
 bool
 SanityCheck::runOnModule(Module & M) {
-  errs() << "SanityCheck runOnModule\n";
+  errs() << "[san-check] runOnModule\n";
   //
   // Get a reference to the DSA pass to check.
   //

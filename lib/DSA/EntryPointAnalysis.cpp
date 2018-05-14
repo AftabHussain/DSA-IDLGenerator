@@ -72,7 +72,7 @@ void EntryPointAnalysis::print(llvm::raw_ostream& O, const Module* M) const {
 }
 
 bool EntryPointAnalysis::runOnModule(llvm::Module& M) {
-  errs() << "EntryPointAnalysis runOnModule\n";
+  errs() << "[entry-pt-anlys] runOnModule\n";
   if (epaFile.size()) {
     haveNames = true;
     readNames(names);

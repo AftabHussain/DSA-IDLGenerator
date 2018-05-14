@@ -546,6 +546,9 @@ StdLibDataStructures::processRuntimeCheck (Module & M,
 
 bool
 StdLibDataStructures::runOnModule (Module &M) {
+  
+  errs()<<"[stdlib-ds] runOnModule\n"; 
+ 
   //
   // Get the results from the local pass.
   //

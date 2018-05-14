@@ -161,6 +161,7 @@ namespace {
     Devirtualize() : ModulePass(&ID) {}
 
     virtual bool runOnModule(Module &M) {
+      errs()<<"[sva-devirt] runOnModule\n";
       CallTargetFinder* CTF = &getAnalysis<CallTargetFinder>();
 
       // Get references to functions that are needed in the module

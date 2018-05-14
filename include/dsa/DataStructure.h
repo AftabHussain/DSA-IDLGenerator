@@ -14,6 +14,10 @@
 #ifndef LLVM_ANALYSIS_DATA_STRUCTURE_H
 #define LLVM_ANALYSIS_DATA_STRUCTURE_H
 
+#include "dsa/DSGraph.h"
+#include "dsa/DSNode.h"
+#include "dsa/DataStructure.h"
+
 #include "dsa/DSCallGraph.h"
 #include "dsa/svset.h"
 #include "dsa/super_set.h"
@@ -21,6 +25,7 @@
 #include "dsa/AllocatorIdentification.h"
 
 #include "llvm/Pass.h"
+#include "llvm/IR/DebugInfo.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/CallSite.h"
 #include "llvm/ADT/EquivalenceClasses.h"
@@ -187,6 +192,7 @@ public:
   /// getAnalysisUsage - This obviously provides a data structure graph.
   ///
   virtual void getAnalysisUsage(AnalysisUsage &AU) const {
+    llvm::errs()<<"[ds.h] adding required pass of DataStructures: AddressTakenAnalysis\n";
     AU.addRequired<AddressTakenAnalysis>();
     AU.setPreservesAll();
   }
@@ -209,6 +215,8 @@ public:
   /// getAnalysisUsage - This obviously provides a data structure graph.
   ///
   virtual void getAnalysisUsage(AnalysisUsage &AU) const {
+   
+    llvm::errs()<<"[ds.h] adding required pass of StdLibDataStructures: LocalDataStructures and AllocIdentify\n";
     AU.addRequired<LocalDataStructures>();
     AU.addRequired<AllocIdentify>();
     AU.setPreservesAll();
@@ -244,6 +252,7 @@ public:
   virtual bool runOnModule(Module &M);
 
   virtual void getAnalysisUsage(AnalysisUsage &AU) const {
+    errs()<<"[ds.h] adding required pass of BUDataStructures: StdLibDataStructures\n";
     AU.addRequired<StdLibDataStructures>();
     AU.setPreservesAll();
   }
@@ -291,6 +300,7 @@ public:
   virtual bool runOnModule(Module &M);
 
   virtual void getAnalysisUsage(AnalysisUsage &AU) const {
+    errs()<<"[ds.h] adding required pass of CompleteBUDataStructures, BUDataStructures\n";
     AU.addRequired<BUDataStructures>();
     AU.setPreservesAll();
   }
@@ -315,6 +325,7 @@ public:
   virtual bool runOnModule(Module &M);
 
   virtual void getAnalysisUsage(AnalysisUsage &AU) const {
+    errs()<<"[ds.h] Adding required pass of EquivBUDataStructures: CompleteBUDataStructures\n";
     AU.addRequired<CompleteBUDataStructures>();
     AU.setPreservesAll();
   }
@@ -368,8 +379,10 @@ public:
   ///
   virtual void getAnalysisUsage(AnalysisUsage &AU) const {
     if (useEQBU) {
+      errs()<<"[ds.h] Adding required pass of TDDataStructures: EquivBUDataStructures\n";	
       AU.addRequired<EquivBUDataStructures>();
     } else {
+      errs()<<"[ds.h] Adding required pass of TDDataStructures: BUDataStructures\n";	
       AU.addRequired<BUDataStructures>();
       AU.addPreserved<BUDataStructures>();
     }

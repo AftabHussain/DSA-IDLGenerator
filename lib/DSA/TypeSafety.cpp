@@ -531,6 +531,9 @@ TypeSafety<dsa>::findTypeSafeDSNodes (const DSGraph * Graph) {
 
 template<class dsa> bool
 TypeSafety<dsa>::runOnModule(Module & M) {
+
+  errs() << "[type-safety] runOnModule\n";
+ 
   //
   // Get access to prerequisite passes.
   //

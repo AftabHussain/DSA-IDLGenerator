@@ -52,9 +52,9 @@ RegisterPass<Devirtualize>
 XX ("devirt", "Devirtualize indirect function calls");
 
 //Preserving previous passes //to check 
-void getAnalysisUsage(llvm::AnalysisUsage &AU) {
-    AU.setPreservesAll();
-}
+//void getAnalysisUsage(llvm::AnalysisUsage &AU) {
+//    AU.setPreservesAll();
+//}
 
 
 
@@ -414,7 +414,7 @@ Devirtualize::makeDirectCall (CallSite & CS) {
 void
 Devirtualize::visitCallSite (CallSite &CS) {
 
-  errs() << "--- Fn visitCallSite ---\n";
+  errs() << "[devirt] visitCallSite \n";
  
   //
   // First, determine if this is a direct call.  If so, then just ignore it.
@@ -423,15 +423,15 @@ Devirtualize::visitCallSite (CallSite &CS) {
 
   //ignore llvm functions
   if (CalledValue->getName().find("llvm") != std::string::npos) {
-    errs() << "ignoring llvm lib fn\n";
+    errs() << "[devirt] ignoring llvm lib fn\n";
     return;
   }
 
 if (isa<Function>(CalledValue->stripPointerCasts()))
 // if (isa<Function>(CalledValue))
   {
-   errs()<<"A Direct Function Call\n";
-   errs()<<"Fn name: "<<CalledValue->getName()<<"\n"; 
+   errs()<<"[devirt] A Direct Function Call\n";
+   errs()<<"[devirt] Fn name: "<<CalledValue->getName()<<"\n"; 
    return;
   }
 
@@ -440,8 +440,8 @@ if (isa<Function>(CalledValue->stripPointerCasts()))
   // for which we know all of the call targets).
   //
   if (!(CTF->isComplete(CS))){
-    errs()<<"Incomplete Call site"<<"\n";
-    errs()<<"Fn name: "<<CalledValue->getName()<<"\n"; 
+    errs()<<"[devirt] Incomplete Call site"<<"\n";
+    errs()<<"[devirt] Fn name: "<<CalledValue->getName()<<"\n"; 
     return;
   }
 
@@ -449,8 +449,8 @@ if (isa<Function>(CalledValue->stripPointerCasts()))
   // This is an indirect call site.  Put it in the worklist of call sites to
   // transforms.
   //
-  errs()<<"An Indirect Function Call\n";
-  errs()<<"Fn name: "<<CalledValue->getName()<<"\n"; 
+  errs()<<"[devirt] An Indirect Function Call\n";
+  errs()<<"[devirt] Fn name: "<<CalledValue->getName()<<"\n"; 
   Worklist.push_back (CS.getInstruction());
   return;
 }
@@ -465,11 +465,12 @@ if (isa<Function>(CalledValue->stripPointerCasts()))
 bool
 Devirtualize::runOnModule (Module & M) {
   
-  errs() << "Now in DEVIRTUALIZE PASS -- In runOnModule F \n";
+  errs() << "[devirt] runOnModule \n";
 
   //
   // Get the targets of indirect function calls.
   //
+  errs() << "[devirt] adding required pass of Devirt: EQTDDataStructures\n";
   CTF = &getAnalysis<dsa::CallTargetFinder<EQTDDataStructures> >();
 
   //
@@ -487,7 +488,7 @@ Devirtualize::runOnModule (Module & M) {
   // Now go through and transform all of the indirect calls that we found that
   // need transforming.
   //
-  errs () << "Number of indirect calls = " << Worklist.size() <<"\n";
+  errs () << "[devirt] Number of indirect calls = " << Worklist.size() <<"\n";
 
   for (unsigned index = 0; index < Worklist.size(); ++index) {
     // Autobots, transform (the call site)!

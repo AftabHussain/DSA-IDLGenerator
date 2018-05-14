@@ -62,6 +62,7 @@ namespace llvm {
       virtual bool runOnModule(Module & M);
 
       virtual void getAnalysisUsage(AnalysisUsage &AU) const {
+	errs()<<"[devirt.h] adding required pass for devirt: EQTDDataStructures\n";
         AU.addRequired<dsa::CallTargetFinder<EQTDDataStructures> >();
       }
 

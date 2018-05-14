@@ -74,7 +74,7 @@ void TDDataStructures::markReachableFunctionsExternallyAccessible(DSNode *N,
 //
 bool TDDataStructures::runOnModule(Module &M) {
 
-  errs() << "TopDownClosure runOnModule\n";
+  errs() << "[TD] runOnModule | useEQBE val "<<useEQBU<<" \n";
   init(useEQBU ? &getAnalysis<EquivBUDataStructures>()
        : &getAnalysis<BUDataStructures>(),
        true, true, true, false);

@@ -1548,7 +1548,9 @@ char LocalDataStructures::ID;
 bool LocalDataStructures::runOnModule(Module &M) {
   errs() << "[local] runOnModule\n";
   init(&M.getDataLayout());
-  addrAnalysis = &getAnalysis<AddressTakenAnalysis>();
+  
+  errs()<< "[local] adding required pass of Local: AddressTakenAnalysis \n"; 
+  addrAnalysis = &getAnalysis<AddressTakenAnalysis>();//Ensure the address taken analysis is done
 
   // First step, build the globals graph.
   {
