@@ -76,7 +76,7 @@ int reg_devops(void(*fp)(struct device_operations *),struct device_operations *d
 	/*The following calls readAndWriteData in my_device.c, which writes on device_info
 	field of devops. However, dsa generator is unable to report it, inside the projection
 	of reg_devops -- calls the function directly via the function pointer */
-	// fp(devops);
+	fp(devops);
 
 	/*SUCCESSFULLY REPORTS - DIRECT FN CALL INSIDE TRANSLATION UNIT*/
 	//CASE 3 - Plain Function call inside the translation unit

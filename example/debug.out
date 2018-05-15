@@ -4,7 +4,7 @@
 [dsagen.h] Adding required passes of dsaGenerator: BUDataStructures
 [ds.h] adding required pass of BUDataStructures: StdLibDataStructures
 [ds.h] adding required pass of StdLibDataStructures: LocalDataStructures and AllocIdentify
-[ds.h] adding required pass of DataStructures: AddressTakenAnalysis
+[ds.h] adding required pass of LocalDataStructures: AddressTakenAnalysis
 [alloc-identify] Adding required passes of AllocIdentify: LoopInfoWrapperPass
 [tools-dsagenerator] Adding Devirt to pass manager.
 [devirt.h] adding required pass for devirt: EQTDDataStructures
@@ -35,60 +35,60 @@ true
 [local] adding required pass of Local: AddressTakenAnalysis 
 [local] Building graph for function: fn_n
 [local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !33, metadata !131), !dbg !132
-[local] visiting load:   %3 = load i32, i32* %2, align 8, !dbg !134, !tbaa !136
-[local] visiting store:   store i8* %., i8** %1, align 8, !dbg !144
-[local] visiting return:   ret i32 0, !dbg !146
+[local] visiting store:   store i8* getelementptr inbounds ([15 x i8], [15 x i8]* @.str, i64 0, i64 0), i8** %1, align 8, !dbg !134, !tbaa !135
+[local] visiting return:   ret i32 0, !dbg !141
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
 [local] Building graph for function: main
 [local] visiting call:   call void @llvm.lifetime.start(i64 40, i8* %1) #5, !dbg !131
 [local] visiting store:   store void (%struct.device*, i8*)* bitcast (void (%struct.device.0*, i8*)* @reg_device to void (%struct.device*, i8*)*), void (%struct.device*, i8*)** %2, align 8, !dbg !133, !tbaa !134
-[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device* %my_printer, i64 0, metadata !38, metadata !153), !dbg !154
-[local] visiting call:   call void bitcast (void (%struct.device.0*, i8*)* @reg_device to void (%struct.device*, i8*)*)(%struct.device* nonnull %my_printer, i8* getelementptr inbounds ([8 x i8], [8 x i8]* @.str.2, i64 0, i64 0)) #5, !dbg !142
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device* %my_printer, i64 0, metadata !38, metadata !148), !dbg !149
+[local] visiting call:   call void bitcast (void (%struct.device.0*, i8*)* @reg_device to void (%struct.device*, i8*)*)(%struct.device* nonnull %my_printer, i8* getelementptr inbounds ([8 x i8], [8 x i8]* @.str.1, i64 0, i64 0)) #5, !dbg !142
 [local] visiting call:   %3 = call i32 @reg_devops(void (%struct.device_operations*)* nonnull @readAndWriteData, %struct.device_operations* bitcast ({ i32 (%struct.packet*)*, void (%struct.device_operations*)*, void (%struct.device_operations*)*, i32 (%struct.device_operations*)*, i32, i8* }* @main.devops to %struct.device_operations*)) #5, !dbg !143
 [local] visiting call:   call void @llvm.lifetime.end(i64 40, i8* %1) #5, !dbg !144
 [local] visiting return:   ret i32 0, !dbg !144
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
 [local] Building graph for function: readAndWriteData
-[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !62, metadata !131), !dbg !158
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !62, metadata !131), !dbg !153
 [local] visiting load:   %2 = load i32, i32* %1, align 8, !dbg !133, !tbaa !135
-[local] visiting store:   store i8* getelementptr inbounds ([11 x i8], [11 x i8]* @.str.1, i64 0, i64 0), i8** %5, align 8, !dbg !145, !tbaa !146
+[local] visiting store:   store i8* getelementptr inbounds ([11 x i8], [11 x i8]* @.str.2, i64 0, i64 0), i8** %5, align 8, !dbg !145, !tbaa !146
 [local] visiting return:   ret void, !dbg !148
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
 [local] Building graph for function: mydev_init
-[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.packet* %p, i64 0, metadata !56, metadata !131), !dbg !169
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.packet* %p, i64 0, metadata !56, metadata !131), !dbg !164
 [local] visiting store:   store i32 0, i32* %1, align 8, !dbg !134, !tbaa !135
 [local] visiting store:   store i8* null, i8** %2, align 8, !dbg !142, !tbaa !143
 [local] visiting return:   ret i32 1, !dbg !144
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
 [local] Building graph for function: mydev_uninit
-[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !59, metadata !131), !dbg !178
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !59, metadata !131), !dbg !173
 [local] visiting store:   store i32 0, i32* %1, align 8, !dbg !134, !tbaa !135
 [local] visiting return:   ret void, !dbg !141
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
 [local] Building graph for function: readData
-[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !65, metadata !131), !dbg !182
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !65, metadata !131), !dbg !177
 [local] visiting load:   %2 = load i32, i32* %1, align 8, !dbg !133, !tbaa !135
 [local] visiting return:   ret i32 %., !dbg !144
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
 [local] Building graph for function: reg_device
-[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device.0* %dev, i64 0, metadata !84, metadata !131), !dbg !189
-[local] visiting call:   tail call void @llvm.dbg.value(metadata i8* %name, i64 0, metadata !85, metadata !131), !dbg !190
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device.0* %dev, i64 0, metadata !84, metadata !131), !dbg !184
+[local] visiting call:   tail call void @llvm.dbg.value(metadata i8* %name, i64 0, metadata !85, metadata !131), !dbg !185
 [local] visiting store:   store i8* %name, i8** %1, align 8, !dbg !135, !tbaa !136
 [local] visiting load:   %2 = load i32, i32* getelementptr inbounds (%struct.device_manager, %struct.device_manager* @dm, i64 0, i32 1), align 8, !dbg !142, !tbaa !143
 [local] visiting store:   store i8* %name, i8** %4, align 8, !dbg !147, !tbaa !148
 [local] visiting return:   ret void, !dbg !149
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
 [local] Building graph for function: foobar
-[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devop, i64 0, metadata !111, metadata !131), !dbg !201
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devop, i64 0, metadata !111, metadata !131), !dbg !196
 [local] visiting store:   store i8* getelementptr inbounds ([10 x i8], [10 x i8]* @.str.3, i64 0, i64 0), i8** %1, align 8, !dbg !134, !tbaa !135
 [local] visiting return:   ret i32 0, !dbg !141
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
 [local] Building graph for function: reg_devops
-[local] visiting call:   tail call void @llvm.dbg.value(metadata void (%struct.device_operations*)* %fp, i64 0, metadata !116, metadata !131), !dbg !205
-[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !117, metadata !131), !dbg !206
-[local] visiting call:   tail call void @llvm.dbg.value(metadata i32 (%struct.device_operations*)* @fn_n, i64 0, metadata !118, metadata !131), !dbg !207
-[local] visiting call:   %1 = tail call i32 @fn_n(%struct.device_operations* %devops) #5, !dbg !135
-[local] visiting return:   ret i32 1, !dbg !136
+[local] visiting call:   tail call void @llvm.dbg.value(metadata void (%struct.device_operations*)* %fp, i64 0, metadata !116, metadata !131), !dbg !200
+[local] visiting call:   tail call void @llvm.dbg.value(metadata %struct.device_operations* %devops, i64 0, metadata !117, metadata !131), !dbg !201
+[local] visiting call:   tail call void %fp(%struct.device_operations* %devops) #5, !dbg !134
+[local] visiting call:   tail call void @llvm.dbg.value(metadata i32 (%struct.device_operations*)* @fn_n, i64 0, metadata !118, metadata !131), !dbg !203
+[local] visiting call:   %1 = tail call i32 @fn_n(%struct.device_operations* %devops) #5, !dbg !136
+[local] visiting return:   ret i32 1, !dbg !137
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
 [alloc-identify] runOnModule
 [stdlib-ds] runOnModule
@@ -104,6 +104,7 @@ true
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [bupclosure] - runOnModule
 [dsgraph] cloneInto - Cloning DSGraph into current graph
+[bupclosure] runOnModuleInternal
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
@@ -129,9 +130,12 @@ true
 [bottomupclosure]    Inlining graph for fn_n[2+0] into 'reg_devops' [2+0]
 [dsgraph] getFunctionArgumentsForCall
 [dsgraph] mergeInGraph-minimal
+[bottomupclosure]    Inlining graph for fn_n[2+0] into 'reg_devops' [3+1]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
 [bupclosure] Recompute the Incomplete markers
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
-  [bupclosure] Done inlining: reg_devops [3+0]
+  [bupclosure] Done inlining: reg_devops [3+1]
 [bupclosure] Visiting single node SCC #: 4 fn: reg_device
   [bupclosure] Calculating graph for: reg_device
 [bupclosure] calculateGraph(DSGraph* Graph)
@@ -145,15 +149,15 @@ true
 [bupclosure] calculateGraph(DSGraph* Graph)
 [bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
-[bottomupclosure]    Inlining graph for reg_devops[3+0] into 'main' [8+0]
+[bottomupclosure]    Inlining graph for reg_devops[3+1] into 'main' [8+0]
 [dsgraph] getFunctionArgumentsForCall
 [dsgraph] mergeInGraph-minimal
-[bottomupclosure]    Inlining graph for reg_device[3+0] into 'main' [9+0]
+[bottomupclosure]    Inlining graph for reg_device[3+0] into 'main' [9+1]
 [dsgraph] getFunctionArgumentsForCall
 [dsgraph] mergeInGraph-minimal
 [bupclosure] Recompute the Incomplete markers
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
-  [bupclosure] Done inlining: main [10+0]
+  [bupclosure] Done inlining: main [10+1]
 [bupclosure] CloneAuxIntoGlobal
 [bupclosure]dsa-bu: Function unreachable from main: readAndWriteData
 [bupclosure] Visiting single node SCC #: 5 fn: readAndWriteData
@@ -216,6 +220,11 @@ true
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
 [dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
 [dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
+[dsgraph] functionIsCallable
+[dsgraph] functionIsCallable
+[dsgraph] functionIsCallable
+[dsgraph] functionIsCallable
+[dsgraph] functionIsCallable
 [dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
 [dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
 [dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites
@@ -233,8 +242,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){fn_n}
 ## Function ## : fn_n | argsize: 1 :: Requested 1
-<0x1eda710> = distinct !DISubprogram(name: "fn_n", scope: <0x1ed3bb0>, file: <0x1ed3bb0>, line: 44, type: <0x1ed8640>, isLocal: false, isDefinition: true, scopeLine: 44, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1ed8a98>) value of the metadata
-type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed8448type information: 0x1ed9478type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
+<0x2fb5610> = distinct !DISubprogram(name: "fn_n", scope: <0x2faeac0>, file: <0x2faeac0>, line: 44, type: <0x2fb3540>, isLocal: false, isDefinition: true, scopeLine: 44, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb3998>) value of the metadata
+type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb3348type information: 0x2fb4378type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -243,11 +252,10 @@ type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed844
 	offset : 40	 | name : device_info
 -------------------------------------------
 checking ii ei
-32 1
-<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
-check type nameintchecking ii ei
+0 0
+checking ii ei
 40 1
-<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
+<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
@@ -263,9 +271,9 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){readAndWriteData}
 ## Function ## : readAndWriteData | argsize: 1 :: Requested 1
-<0x1ede4b0> = distinct !DISubprogram(name: "readAndWriteData", scope: <0x1ed3bb0>, file: <0x1ed3bb0>, line: 37, type: <0x1ed8350>, isLocal: true, isDefinition: true, scopeLine: 37, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1ede3a8>) value of the metadata
+<0x2fb93b0> = distinct !DISubprogram(name: "readAndWriteData", scope: <0x2faeac0>, file: <0x2faeac0>, line: 37, type: <0x2fb3250>, isLocal: true, isDefinition: true, scopeLine: 37, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb92a8>) value of the metadata
 return type "void" for Function : readAndWriteData
-type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed8448type information: 0x1ed9478type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
+type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb3348type information: 0x2fb4378type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -275,10 +283,10 @@ type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed844
 -------------------------------------------
 checking ii ei
 32 1
-<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x2fa9628> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintchecking ii ei
 40 1
-<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
+<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
@@ -290,8 +298,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){mydev_init}
 ## Function ## : mydev_init | argsize: 1 :: Requested 1
-<0x1edd3f0> = distinct !DISubprogram(name: "mydev_init", scope: <0x1ed3bb0>, file: <0x1ed3bb0>, line: 8, type: <0x1ed70d0>, isLocal: true, isDefinition: true, scopeLine: 8, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1edcb38>) value of the metadata
-type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
+<0x2fb82f0> = distinct !DISubprogram(name: "mydev_init", scope: <0x2faeac0>, file: <0x2faeac0>, line: 8, type: <0x2fb1fd0>, isLocal: true, isDefinition: true, scopeLine: 8, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb7a38>) value of the metadata
+type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
 	offset : 0	 | name : p
 	offset : 8	 | name : data
 -------------------------------------------
@@ -299,8 +307,8 @@ checking ii ei
 0 0
 checking ii ei
 0 2
-<0x1ed6e38> = !DIBasicType(name: "char", size: 8, align: 8, encoding: DW_ATE_signed_char)
-check type namechar<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
+<0x2fb1d38> = !DIBasicType(name: "char", size: 8, align: 8, encoding: DW_ATE_signed_char)
+check type namechar<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
 check type namecheck type namecharScanning Function {mydev_uninit}
 a defined function{mydev_uninit}
 Scanning argument {devops}
@@ -309,9 +317,9 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){mydev_uninit}
 ## Function ## : mydev_uninit | argsize: 1 :: Requested 1
-<0x1eddc70> = distinct !DISubprogram(name: "mydev_uninit", scope: <0x1ed3bb0>, file: <0x1ed3bb0>, line: 15, type: <0x1ed8350>, isLocal: true, isDefinition: true, scopeLine: 15, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1eddb68>) value of the metadata
+<0x2fb8b70> = distinct !DISubprogram(name: "mydev_uninit", scope: <0x2faeac0>, file: <0x2faeac0>, line: 15, type: <0x2fb3250>, isLocal: true, isDefinition: true, scopeLine: 15, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb8a68>) value of the metadata
 return type "void" for Function : mydev_uninit
-type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed8448type information: 0x1ed9478type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
+type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb3348type information: 0x2fb4378type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -323,7 +331,7 @@ checking ii ei
 0 0
 checking ii ei
 32 1
-<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x2fa9628> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintScanning Function {readData}
 a defined function{readData}
 Scanning argument {devops}
@@ -332,8 +340,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){readData}
 ## Function ## : readData | argsize: 1 :: Requested 1
-<0x1ede740> = distinct !DISubprogram(name: "readData", scope: <0x1ed3bb0>, file: <0x1ed3bb0>, line: 20, type: <0x1ed8640>, isLocal: true, isDefinition: true, scopeLine: 20, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1edda48>) value of the metadata
-type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed8448type information: 0x1ed9478type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
+<0x2fb9640> = distinct !DISubprogram(name: "readData", scope: <0x2faeac0>, file: <0x2faeac0>, line: 20, type: <0x2fb3540>, isLocal: true, isDefinition: true, scopeLine: 20, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb8948>) value of the metadata
+type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb3348type information: 0x2fb4378type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -343,7 +351,7 @@ type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed844
 -------------------------------------------
 checking ii ei
 32 1
-<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x2fa9628> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintchecking ii ei
 0 0
 Scanning Function {llvm.lifetime.end}
@@ -355,9 +363,9 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){reg_device}
 ## Function ## : reg_device | argsize: 2 :: Requested 1
-<0x1edf830> = distinct !DISubprogram(name: "reg_device", scope: <0x1edf070>, file: <0x1edf070>, line: 22, type: <0x1edf430>, isLocal: false, isDefinition: true, scopeLine: 22, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1edf0a0>) value of the metadata
+<0x2fba730> = distinct !DISubprogram(name: "reg_device", scope: <0x2fb9f70>, file: <0x2fb9f70>, line: 22, type: <0x2fba330>, isLocal: false, isDefinition: true, scopeLine: 22, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb9fa0>) value of the metadata
 return type "void" for Function : reg_device
-type information: 0x1ed6ea8type information: 0x1edb260type information: 0x1edfa48type information: 0x1ed8148type information: 0x1ed8148-------------------------------------------
+type information: 0x2fb1da8type information: 0x2fb6160type information: 0x2fba948type information: 0x2fb3048type information: 0x2fb3048-------------------------------------------
 	offset : 0	 | name : dev
 	offset : 8	 | name : status
 	offset : 24	 | name : set_device
@@ -368,7 +376,7 @@ checking ii ei
 0 0
 checking ii ei
 0 1
-<0x1ed8148> = !DIBasicType(name: "float", size: 32, align: 32, encoding: DW_ATE_float)
+<0x2fb3048> = !DIBasicType(name: "float", size: 32, align: 32, encoding: DW_ATE_float)
 check type namefloat-------------------------------------------
 	offset : 0	 | name : dev
 -------------------------------------------
@@ -383,8 +391,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){foobar}
 ## Function ## : foobar | argsize: 1 :: Requested 1
-<0x1ee2880> = distinct !DISubprogram(name: "foobar", scope: <0x1edf070>, file: <0x1edf070>, line: 42, type: <0x1ee2530>, isLocal: false, isDefinition: true, scopeLine: 42, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1ee2778>) value of the metadata
-type information: 0x1ee1888type information: 0x1ee1cf8type information: 0x1ee1cf8type information: 0x1ee32e8type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
+<0x2fbd7c0> = distinct !DISubprogram(name: "foobar", scope: <0x2fb9f70>, file: <0x2fb9f70>, line: 42, type: <0x2fb1ad0>, isLocal: false, isDefinition: true, scopeLine: 42, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fbd6b8>) value of the metadata
+type information: 0x2fbc788type information: 0x2fbcbf8type information: 0x2fbcbf8type information: 0x2fbe1e8type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
 	offset : 0	 | name : devop
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -396,7 +404,7 @@ checking ii ei
 0 0
 checking ii ei
 40 1
-<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
+<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devop
 -------------------------------------------
@@ -408,7 +416,7 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){reg_devops}
 ## Function ## : reg_devops | argsize: 2 :: Requested 1
-<0x1ee5ac0> = distinct !DISubprogram(name: "reg_devops", scope: <0x1edf070>, file: <0x1edf070>, line: 59, type: <0x1ee28e0>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1edf888>) value of the metadata
+<0x2fc09c0> = distinct !DISubprogram(name: "reg_devops", scope: <0x2fb9f70>, file: <0x2fb9f70>, line: 59, type: <0x2fbe180>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fba8a8>) value of the metadata
 -------------------------------------------
 -------------------------------------------
 Scanning argument {devops}
@@ -417,8 +425,8 @@ isglobal: 0-------------------
 arg.getArgNo(){1}
 F.getName(){reg_devops}
 ## Function ## : reg_devops | argsize: 2 :: Requested 2
-<0x1ee5ac0> = distinct !DISubprogram(name: "reg_devops", scope: <0x1edf070>, file: <0x1edf070>, line: 59, type: <0x1ee28e0>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x1edf888>) value of the metadata
-type information: 0x1ee1888type information: 0x1ee1cf8type information: 0x1ee1cf8type information: 0x1ee32e8type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
+<0x2fc09c0> = distinct !DISubprogram(name: "reg_devops", scope: <0x2fb9f70>, file: <0x2fb9f70>, line: 59, type: <0x2fbe180>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fba8a8>) value of the metadata
+type information: 0x2fbc788type information: 0x2fbcbf8type information: 0x2fbcbf8type information: 0x2fbe1e8type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -427,15 +435,14 @@ type information: 0x1ee1888type information: 0x1ee1cf8type information: 0x1ee1cf
 	offset : 40	 | name : device_info
 -------------------------------------------
 checking ii ei
-32 1
-<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
-check type nameintchecking ii ei
+0 0
+checking ii ei
 40 1
-<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
+<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
-type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed8448type information: 0x1ed9478type information: 0x1ece568type information: 0x1ed6ea8-------------------------------------------
+type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb3348type information: 0x2fb4378type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -446,11 +453,10 @@ type information: 0x1ed73d8type information: 0x1ed8448type information: 0x1ed844
 name: devops-------------
 is global: 1---------------
 checking ii ei
-32 1
-<0x1ece568> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
-check type nameintchecking ii ei
+0 0
+checking ii ei
 40 1
-<0x1ed6ea8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x1ed6e38>, size: 64, align: 64)
+<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
@@ -475,6 +481,7 @@ check type namecheck type namechar-------------------------------------------
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [complete-bup] buildIndirectFunctionSets (void)
+[bupclosure] runOnModuleInternal
 [bupclosure] Visiting single node SCC #: 3 fn: fn_n
   [bupclosure] Calculating graph for: fn_n
 [bupclosure] calculateGraph(DSGraph* Graph)
@@ -491,9 +498,12 @@ check type namecheck type namechar-------------------------------------------
 [bottomupclosure]    Inlining graph for fn_n[2+0] into 'reg_devops' [3+0]
 [dsgraph] getFunctionArgumentsForCall
 [dsgraph] mergeInGraph-minimal
+[bottomupclosure]    Inlining graph for fn_n[2+0] into 'reg_devops' [3+1]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
 [bupclosure] Recompute the Incomplete markers
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
-  [bupclosure] Done inlining: reg_devops [3+0]
+  [bupclosure] Done inlining: reg_devops [3+1]
 [bupclosure] Visiting single node SCC #: 4 fn: reg_device
   [bupclosure] Calculating graph for: reg_device
 [bupclosure] calculateGraph(DSGraph* Graph)
@@ -507,15 +517,15 @@ check type namecheck type namechar-------------------------------------------
 [bupclosure] calculateGraph(DSGraph* Graph)
 [bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
-[bottomupclosure]    Inlining graph for reg_devops[3+0] into 'main' [10+0]
+[bottomupclosure]    Inlining graph for reg_devops[3+1] into 'main' [7+0]
 [dsgraph] getFunctionArgumentsForCall
 [dsgraph] mergeInGraph-minimal
-[bottomupclosure]    Inlining graph for reg_device[3+0] into 'main' [10+0]
+[bottomupclosure]    Inlining graph for reg_device[3+0] into 'main' [7+1]
 [dsgraph] getFunctionArgumentsForCall
 [dsgraph] mergeInGraph-minimal
 [bupclosure] Recompute the Incomplete markers
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
-  [bupclosure] Done inlining: main [10+0]
+  [bupclosure] Done inlining: main [7+1]
 [bupclosure] CloneAuxIntoGlobal
 [bupclosure]dsa-cbu: Function unreachable from main: readAndWriteData
 [bupclosure] Visiting single node SCC #: 5 fn: readAndWriteData
@@ -597,6 +607,14 @@ check type namecheck type namechar-------------------------------------------
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [complete-bup] buildIndirectFunctionSets (void)
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] cloneInto - Cloning DSGraph into current graph
+[dsgraph] getFunctionArgumentsForCall
+[bupclosure] runOnModuleInternal
 [bupclosure] Visiting single node SCC #: 3 fn: fn_n
   [bupclosure] Calculating graph for: fn_n
 [bupclosure] calculateGraph(DSGraph* Graph)
@@ -613,9 +631,12 @@ check type namecheck type namechar-------------------------------------------
 [bottomupclosure]    Inlining graph for fn_n[2+0] into 'reg_devops' [3+0]
 [dsgraph] getFunctionArgumentsForCall
 [dsgraph] mergeInGraph-minimal
+[bottomupclosure]    Inlining graph for fn_n[2+0] into 'reg_devops' [3+1]
+[dsgraph] getFunctionArgumentsForCall
+[dsgraph] mergeInGraph-minimal
 [bupclosure] Recompute the Incomplete markers
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
-  [bupclosure] Done inlining: reg_devops [3+0]
+  [bupclosure] Done inlining: reg_devops [3+1]
 [bupclosure] Visiting single node SCC #: 4 fn: reg_device
   [bupclosure] Calculating graph for: reg_device
 [bupclosure] calculateGraph(DSGraph* Graph)
@@ -629,15 +650,15 @@ check type namecheck type namechar-------------------------------------------
 [bupclosure] calculateGraph(DSGraph* Graph)
 [bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
-[bottomupclosure]    Inlining graph for reg_devops[3+0] into 'main' [10+0]
+[bottomupclosure]    Inlining graph for reg_devops[3+1] into 'main' [7+0]
 [dsgraph] getFunctionArgumentsForCall
 [dsgraph] mergeInGraph-minimal
-[bottomupclosure]    Inlining graph for reg_device[3+0] into 'main' [10+0]
+[bottomupclosure]    Inlining graph for reg_device[3+0] into 'main' [7+1]
 [dsgraph] getFunctionArgumentsForCall
 [dsgraph] mergeInGraph-minimal
 [bupclosure] Recompute the Incomplete markers
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
-  [bupclosure] Done inlining: main [10+0]
+  [bupclosure] Done inlining: main [7+1]
 [bupclosure] CloneAuxIntoGlobal
 [bupclosure]dsa-eq: Function unreachable from main: readAndWriteData
 [bupclosure] Visiting single node SCC #: 5 fn: readAndWriteData
@@ -649,38 +670,8 @@ check type namecheck type namechar-------------------------------------------
 [dsgraph] buildCallGraph - Getting list of unresolved call sites
   [bupclosure] Done inlining: readAndWriteData [2+0]
 [bupclosure] CloneAuxIntoGlobal
-[bupclosure]dsa-eq: Function unreachable from main: mydev_init
-[bupclosure] Visiting single node SCC #: 6 fn: mydev_init
-  [bupclosure] Calculating graph for: mydev_init
-[bupclosure] calculateGraph(DSGraph* Graph)
-[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
-[dsgraph] buildCallGraph - Getting list of unresolved call sites
-[bupclosure] Recompute the Incomplete markers
-[dsgraph] buildCallGraph - Getting list of unresolved call sites
-  [bupclosure] Done inlining: mydev_init [1+0]
-[bupclosure] CloneAuxIntoGlobal
-[bupclosure]dsa-eq: Function unreachable from main: mydev_uninit
-[bupclosure] Visiting single node SCC #: 7 fn: mydev_uninit
-  [bupclosure] Calculating graph for: mydev_uninit
-[bupclosure] calculateGraph(DSGraph* Graph)
-[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
-[dsgraph] buildCallGraph - Getting list of unresolved call sites
-[bupclosure] Recompute the Incomplete markers
-[dsgraph] buildCallGraph - Getting list of unresolved call sites
-  [bupclosure] Done inlining: mydev_uninit [1+0]
-[bupclosure] CloneAuxIntoGlobal
-[bupclosure]dsa-eq: Function unreachable from main: readData
-[bupclosure] Visiting single node SCC #: 8 fn: readData
-  [bupclosure] Calculating graph for: readData
-[bupclosure] calculateGraph(DSGraph* Graph)
-[bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
-[dsgraph] buildCallGraph - Getting list of unresolved call sites
-[bupclosure] Recompute the Incomplete markers
-[dsgraph] buildCallGraph - Getting list of unresolved call sites
-  [bupclosure] Done inlining: readData [1+0]
-[bupclosure] CloneAuxIntoGlobal
 [bupclosure]dsa-eq: Function unreachable from main: foobar
-[bupclosure] Visiting single node SCC #: 9 fn: foobar
+[bupclosure] Visiting single node SCC #: 6 fn: foobar
   [bupclosure] Calculating graph for: foobar
 [bupclosure] calculateGraph(DSGraph* Graph)
 [bupclosure] Inline all graphs in the callgraph and remove callsites that are completely dealt with
@@ -715,22 +706,21 @@ check type namecheck type namechar-------------------------------------------
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
 [dsgraph] cloneInto - Cloning DSGraph into current graph
-[dsgraph] cloneInto - Cloning DSGraph into current graph
-[dsgraph] cloneInto - Cloning DSGraph into current graph
-[dsgraph] cloneInto - Cloning DSGraph into current graph
 [TD] Inlining callers into 'foobar'
-[TD] Inlining callers into 'readData'
-[TD] Inlining callers into 'mydev_uninit'
-[TD] Inlining callers into 'mydev_init'
-[TD] Inlining callers into 'readAndWriteData'
 [TD] Inlining callers into 'main'
 [TD] Inlining callers into 'reg_device'
    [TD] Inlining graph into Fn 'reg_device' from [TD] Fn 'main'[TD] : 2 args
 [TD] Inlining callers into 'reg_devops'
    [TD] Inlining graph into Fn 'reg_devops' from [TD] Fn 'main'[TD] : 2 args
+[TD] Inlining callers into 'readAndWriteData mydev_init mydev_uninit readData'
+   [TD] Inlining graph into Fn 'readData' from [TD] SYNTHESIZED INDIRECT GRAPH[TD] : 1 args
+   [TD] Inlining graph into Fn 'mydev_uninit' from [TD] SYNTHESIZED INDIRECT GRAPH[TD] : 1 args
+   [TD] Inlining graph into Fn 'mydev_init' from [TD] SYNTHESIZED INDIRECT GRAPH[TD] : 1 args
+   [TD] Inlining graph into Fn 'readAndWriteData' from [TD] SYNTHESIZED INDIRECT GRAPH[TD] : 1 args
 [TD] Inlining callers into 'fn_n'
    [TD] Inlining graph into Fn 'fn_n' from [TD] Fn 'reg_devops'[TD] : 1 args
 [call-targs] runOnModule
+[call-targs] Found Call instruction
 [call-targs] Found Call instruction
 [call-targs] Found Call instruction
 [call-targs] Found Call instruction
@@ -783,6 +773,9 @@ check type namecheck type namechar-------------------------------------------
 [devirt] ignoring llvm lib fn
 [devirt] visitCallSite 
 [devirt] ignoring llvm lib fn
+[devirt] visitCallSite 
+[devirt] Incomplete Call site
+[devirt] Fn name: fp
 [devirt] visitCallSite 
 [devirt] ignoring llvm lib fn
 [devirt] visitCallSite 

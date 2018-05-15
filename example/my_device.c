@@ -45,9 +45,9 @@ int fn_n(struct device_operations *devops){
 
 	 devops->device_info = "another device";
 
-	 if (devops->devop_init_registered>0){
-		 devops->device_info = "new device";	
-	}
+	// if (devops->devop_init_registered>0){
+	//	 devops->device_info = "new device";	
+	//}
 
 	//plain fn call -> plain fn call, all in same translation unit
 	/*If we have the following line, the write on device_info via readAndWriteData is reported in the projection of fn_n*/

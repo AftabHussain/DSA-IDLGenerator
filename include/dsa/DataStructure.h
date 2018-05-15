@@ -192,7 +192,7 @@ public:
   /// getAnalysisUsage - This obviously provides a data structure graph.
   ///
   virtual void getAnalysisUsage(AnalysisUsage &AU) const {
-    llvm::errs()<<"[ds.h] adding required pass of DataStructures: AddressTakenAnalysis\n";
+    llvm::errs()<<"[ds.h] adding required pass of LocalDataStructures: AddressTakenAnalysis\n";
     AU.addRequired<AddressTakenAnalysis>();
     AU.setPreservesAll();
   }

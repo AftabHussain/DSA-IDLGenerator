@@ -58,6 +58,8 @@ bool BUDataStructures::runOnModule(Module &M) {
 // inline bottom up
 //
 bool BUDataStructures::runOnModuleInternal(Module& M) {
+  
+  errs()<<"[bupclosure] runOnModuleInternal\n";
 
   //
   // Make sure we have a DSGraph for all declared functions in the Module.
