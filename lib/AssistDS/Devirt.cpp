@@ -482,6 +482,7 @@ Devirtualize::runOnModule (Module & M) {
   // Visit all of the call instructions in this function and record those that
   // are indirect function calls.
   //
+  errs () << "[devirt] Visit all of the call instructions in this function and record those that are indirect function calls.\n";
   visit (M);
 
   //
@@ -490,11 +491,13 @@ Devirtualize::runOnModule (Module & M) {
   //
   errs () << "[devirt] Number of indirect calls = " << Worklist.size() <<"\n";
 
-  for (unsigned index = 0; index < Worklist.size(); ++index) {
+  //The following is not required for DSA-IDL-Generator as we are not looking to perform any 
+  //transforms.
+  //for (unsigned index = 0; index < Worklist.size(); ++index) {
     // Autobots, transform (the call site)!
-    CallSite CS (Worklist[index]);
-    makeDirectCall (CS);
-  }
+    //CallSite CS (Worklist[index]);
+    //makeDirectCall (CS);
+  //}
 
   //
   // Conservatively assume that we've changed one or more call sites.
