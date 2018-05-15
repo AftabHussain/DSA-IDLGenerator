@@ -242,8 +242,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){fn_n}
 ## Function ## : fn_n | argsize: 1 :: Requested 1
-<0x2fb5610> = distinct !DISubprogram(name: "fn_n", scope: <0x2faeac0>, file: <0x2faeac0>, line: 44, type: <0x2fb3540>, isLocal: false, isDefinition: true, scopeLine: 44, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb3998>) value of the metadata
-type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb3348type information: 0x2fb4378type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
+<0x2ec0610> = distinct !DISubprogram(name: "fn_n", scope: <0x2eb9ac0>, file: <0x2eb9ac0>, line: 44, type: <0x2ebe540>, isLocal: false, isDefinition: true, scopeLine: 44, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2ebe998>) value of the metadata
+type information: 0x2ebd2d8type information: 0x2ebe348type information: 0x2ebe348type information: 0x2ebf378type information: 0x2eb4628type information: 0x2ebcda8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -255,7 +255,7 @@ checking ii ei
 0 0
 checking ii ei
 40 1
-<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
+<0x2ebcda8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2ebcd38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
@@ -271,9 +271,9 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){readAndWriteData}
 ## Function ## : readAndWriteData | argsize: 1 :: Requested 1
-<0x2fb93b0> = distinct !DISubprogram(name: "readAndWriteData", scope: <0x2faeac0>, file: <0x2faeac0>, line: 37, type: <0x2fb3250>, isLocal: true, isDefinition: true, scopeLine: 37, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb92a8>) value of the metadata
+<0x2ec43b0> = distinct !DISubprogram(name: "readAndWriteData", scope: <0x2eb9ac0>, file: <0x2eb9ac0>, line: 37, type: <0x2ebe250>, isLocal: true, isDefinition: true, scopeLine: 37, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2ec42a8>) value of the metadata
 return type "void" for Function : readAndWriteData
-type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb3348type information: 0x2fb4378type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
+type information: 0x2ebd2d8type information: 0x2ebe348type information: 0x2ebe348type information: 0x2ebf378type information: 0x2eb4628type information: 0x2ebcda8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -283,10 +283,10 @@ type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb334
 -------------------------------------------
 checking ii ei
 32 1
-<0x2fa9628> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x2eb4628> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintchecking ii ei
 40 1
-<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
+<0x2ebcda8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2ebcd38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
@@ -298,8 +298,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){mydev_init}
 ## Function ## : mydev_init | argsize: 1 :: Requested 1
-<0x2fb82f0> = distinct !DISubprogram(name: "mydev_init", scope: <0x2faeac0>, file: <0x2faeac0>, line: 8, type: <0x2fb1fd0>, isLocal: true, isDefinition: true, scopeLine: 8, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb7a38>) value of the metadata
-type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
+<0x2ec32f0> = distinct !DISubprogram(name: "mydev_init", scope: <0x2eb9ac0>, file: <0x2eb9ac0>, line: 8, type: <0x2ebcfd0>, isLocal: true, isDefinition: true, scopeLine: 8, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2ec2a38>) value of the metadata
+type information: 0x2eb4628type information: 0x2ebcda8-------------------------------------------
 	offset : 0	 | name : p
 	offset : 8	 | name : data
 -------------------------------------------
@@ -307,8 +307,8 @@ checking ii ei
 0 0
 checking ii ei
 0 2
-<0x2fb1d38> = !DIBasicType(name: "char", size: 8, align: 8, encoding: DW_ATE_signed_char)
-check type namechar<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
+<0x2ebcd38> = !DIBasicType(name: "char", size: 8, align: 8, encoding: DW_ATE_signed_char)
+check type namechar<0x2ebcda8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2ebcd38>, size: 64, align: 64)
 check type namecheck type namecharScanning Function {mydev_uninit}
 a defined function{mydev_uninit}
 Scanning argument {devops}
@@ -317,9 +317,9 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){mydev_uninit}
 ## Function ## : mydev_uninit | argsize: 1 :: Requested 1
-<0x2fb8b70> = distinct !DISubprogram(name: "mydev_uninit", scope: <0x2faeac0>, file: <0x2faeac0>, line: 15, type: <0x2fb3250>, isLocal: true, isDefinition: true, scopeLine: 15, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb8a68>) value of the metadata
+<0x2ec3b70> = distinct !DISubprogram(name: "mydev_uninit", scope: <0x2eb9ac0>, file: <0x2eb9ac0>, line: 15, type: <0x2ebe250>, isLocal: true, isDefinition: true, scopeLine: 15, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2ec3a68>) value of the metadata
 return type "void" for Function : mydev_uninit
-type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb3348type information: 0x2fb4378type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
+type information: 0x2ebd2d8type information: 0x2ebe348type information: 0x2ebe348type information: 0x2ebf378type information: 0x2eb4628type information: 0x2ebcda8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -331,7 +331,7 @@ checking ii ei
 0 0
 checking ii ei
 32 1
-<0x2fa9628> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x2eb4628> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintScanning Function {readData}
 a defined function{readData}
 Scanning argument {devops}
@@ -340,8 +340,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){readData}
 ## Function ## : readData | argsize: 1 :: Requested 1
-<0x2fb9640> = distinct !DISubprogram(name: "readData", scope: <0x2faeac0>, file: <0x2faeac0>, line: 20, type: <0x2fb3540>, isLocal: true, isDefinition: true, scopeLine: 20, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb8948>) value of the metadata
-type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb3348type information: 0x2fb4378type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
+<0x2ec4640> = distinct !DISubprogram(name: "readData", scope: <0x2eb9ac0>, file: <0x2eb9ac0>, line: 20, type: <0x2ebe540>, isLocal: true, isDefinition: true, scopeLine: 20, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2ec3948>) value of the metadata
+type information: 0x2ebd2d8type information: 0x2ebe348type information: 0x2ebe348type information: 0x2ebf378type information: 0x2eb4628type information: 0x2ebcda8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -351,7 +351,7 @@ type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb334
 -------------------------------------------
 checking ii ei
 32 1
-<0x2fa9628> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
+<0x2eb4628> = !DIBasicType(name: "int", size: 32, align: 32, encoding: DW_ATE_signed)
 check type nameintchecking ii ei
 0 0
 Scanning Function {llvm.lifetime.end}
@@ -363,9 +363,9 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){reg_device}
 ## Function ## : reg_device | argsize: 2 :: Requested 1
-<0x2fba730> = distinct !DISubprogram(name: "reg_device", scope: <0x2fb9f70>, file: <0x2fb9f70>, line: 22, type: <0x2fba330>, isLocal: false, isDefinition: true, scopeLine: 22, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fb9fa0>) value of the metadata
+<0x2ec5730> = distinct !DISubprogram(name: "reg_device", scope: <0x2ec4f70>, file: <0x2ec4f70>, line: 22, type: <0x2ec5330>, isLocal: false, isDefinition: true, scopeLine: 22, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2ec4fa0>) value of the metadata
 return type "void" for Function : reg_device
-type information: 0x2fb1da8type information: 0x2fb6160type information: 0x2fba948type information: 0x2fb3048type information: 0x2fb3048-------------------------------------------
+type information: 0x2ebcda8type information: 0x2ec1160type information: 0x2ec5948type information: 0x2ebe048type information: 0x2ebe048-------------------------------------------
 	offset : 0	 | name : dev
 	offset : 8	 | name : status
 	offset : 24	 | name : set_device
@@ -376,7 +376,7 @@ checking ii ei
 0 0
 checking ii ei
 0 1
-<0x2fb3048> = !DIBasicType(name: "float", size: 32, align: 32, encoding: DW_ATE_float)
+<0x2ebe048> = !DIBasicType(name: "float", size: 32, align: 32, encoding: DW_ATE_float)
 check type namefloat-------------------------------------------
 	offset : 0	 | name : dev
 -------------------------------------------
@@ -391,8 +391,8 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){foobar}
 ## Function ## : foobar | argsize: 1 :: Requested 1
-<0x2fbd7c0> = distinct !DISubprogram(name: "foobar", scope: <0x2fb9f70>, file: <0x2fb9f70>, line: 42, type: <0x2fb1ad0>, isLocal: false, isDefinition: true, scopeLine: 42, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fbd6b8>) value of the metadata
-type information: 0x2fbc788type information: 0x2fbcbf8type information: 0x2fbcbf8type information: 0x2fbe1e8type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
+<0x2ec8780> = distinct !DISubprogram(name: "foobar", scope: <0x2ec4f70>, file: <0x2ec4f70>, line: 42, type: <0x2ec8430>, isLocal: false, isDefinition: true, scopeLine: 42, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2ec8678>) value of the metadata
+type information: 0x2ec7788type information: 0x2ec7bf8type information: 0x2ec7bf8type information: 0x2ec91e8type information: 0x2eb4628type information: 0x2ebcda8-------------------------------------------
 	offset : 0	 | name : devop
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -404,7 +404,7 @@ checking ii ei
 0 0
 checking ii ei
 40 1
-<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
+<0x2ebcda8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2ebcd38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devop
 -------------------------------------------
@@ -416,7 +416,7 @@ isglobal: 0-------------------
 arg.getArgNo(){0}
 F.getName(){reg_devops}
 ## Function ## : reg_devops | argsize: 2 :: Requested 1
-<0x2fc09c0> = distinct !DISubprogram(name: "reg_devops", scope: <0x2fb9f70>, file: <0x2fb9f70>, line: 59, type: <0x2fbe180>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fba8a8>) value of the metadata
+<0x2ecb9c0> = distinct !DISubprogram(name: "reg_devops", scope: <0x2ec4f70>, file: <0x2ec4f70>, line: 59, type: <0x2ec87e0>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2ec5788>) value of the metadata
 -------------------------------------------
 -------------------------------------------
 Scanning argument {devops}
@@ -425,8 +425,8 @@ isglobal: 0-------------------
 arg.getArgNo(){1}
 F.getName(){reg_devops}
 ## Function ## : reg_devops | argsize: 2 :: Requested 2
-<0x2fc09c0> = distinct !DISubprogram(name: "reg_devops", scope: <0x2fb9f70>, file: <0x2fb9f70>, line: 59, type: <0x2fbe180>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2fba8a8>) value of the metadata
-type information: 0x2fbc788type information: 0x2fbcbf8type information: 0x2fbcbf8type information: 0x2fbe1e8type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
+<0x2ecb9c0> = distinct !DISubprogram(name: "reg_devops", scope: <0x2ec4f70>, file: <0x2ec4f70>, line: 59, type: <0x2ec87e0>, isLocal: false, isDefinition: true, scopeLine: 59, flags: DIFlagPrototyped, isOptimized: true, variables: <0x2ec5788>) value of the metadata
+type information: 0x2ec7788type information: 0x2ec7bf8type information: 0x2ec7bf8type information: 0x2ec91e8type information: 0x2eb4628type information: 0x2ebcda8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -438,11 +438,11 @@ checking ii ei
 0 0
 checking ii ei
 40 1
-<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
+<0x2ebcda8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2ebcd38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
-type information: 0x2fb22d8type information: 0x2fb3348type information: 0x2fb3348type information: 0x2fb4378type information: 0x2fa9628type information: 0x2fb1da8-------------------------------------------
+type information: 0x2ebd2d8type information: 0x2ebe348type information: 0x2ebe348type information: 0x2ebf378type information: 0x2eb4628type information: 0x2ebcda8-------------------------------------------
 	offset : 0	 | name : devops
 	offset : 8	 | name : dop_uninit
 	offset : 16	 | name : dop_read_write
@@ -456,7 +456,7 @@ checking ii ei
 0 0
 checking ii ei
 40 1
-<0x2fb1da8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2fb1d38>, size: 64, align: 64)
+<0x2ebcda8> = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: <0x2ebcd38>, size: 64, align: 64)
 check type namecheck type namechar-------------------------------------------
 	offset : 0	 | name : devops
 -------------------------------------------
@@ -741,6 +741,7 @@ check type namecheck type namechar-------------------------------------------
 [call-targs] No. of Direct Calls 0
 [devirt] runOnModule 
 [devirt] adding required pass of Devirt: EQTDDataStructures
+[devirt] Visit all of the call instructions in this function and record those that are indirect function calls.
 [devirt] visitCallSite 
 [devirt] ignoring llvm lib fn
 [devirt] visitCallSite 
