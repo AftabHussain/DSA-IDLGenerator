@@ -83,8 +83,8 @@ int main(int argc, char **argv) {
   pass_manager.add(new dsa::DSAGenerator(FunctionsList));
 
 
-  errs()<<"[tools-dsagenerator] Adding Devirt to pass manager.\n";  
-  pass_manager.add(new llvm::Devirtualize());
+  // errs()<<"[tools-dsagenerator] Adding Devirt to pass manager.\n";  
+  // pass_manager.add(new llvm::Devirtualize());
   //pass_manager.add(new dsa::UndefinedFunctionsPass(FunctionsList));
 
 

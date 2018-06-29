@@ -71,12 +71,18 @@ namespace dsa {
 
 			/*substr(7) because names begins with "struct." --- 7 characters
 			projection <struct structure_name> function_name.argument name*/	
-			*file << indentation << "\nprojection <struct " << dyn_cast<StructType>(argType)->getName().substr(7).str() << "> " << functionName << "." << elementName.str() << " {\n";
+			// *file << indentation << "\nprojection <struct " << dyn_cast<StructType>(argType)->getName().substr(7).str() << "> " << functionName << "." << elementName.str() << " {\n";
+			
+			//Condensed idl
+			*file << "Function: " << functionName <<"\n";
+			*file << "Projects structure: " << dyn_cast<StructType>(argType)->getName().substr(7).str()  <<"\n";
+			// *file << indentation << "\nprojection <struct " << dyn_cast<StructType>(argType)->getName().substr(7).str() << "> " << functionName << "." << elementName.str() << " {\n";
                         
 			//*file << (node->isCollapsedNode() ? "collapsed\n" : "not collapsed\n");
 			offsetPrinter(*node, *file, "read", of2, functionName, indentation);
 			offsetPrinter(*node, *file, "write", of2, functionName, indentation);
-			*file << indentation << "}\n\n";
+			*file << "\n\n";
+			// *file << indentation << "}\n\n";
 		} 
 
 		//else
@@ -322,12 +328,14 @@ namespace dsa {
 		DSNode::const_offset_iterator ii, ei;
 		//int sz, i=0;
 		if (op.str() == "read") {
-			file << "\n" << indent << "Read: \n";
+			file <<  "Read: \n";
+			// file << "\n" << indent << "Read: \n";
 			ii = node.read_offset_begin();
 			ei = node.read_offset_end();
 			//sz = node.read_offset_sz();
 		} else if (op.str() == "write") {
-			file << "\n" << indent << "Write: \n";
+			file <<  "Write: \n";
+			// file << "\n" << indent << "Write: \n";
 			ii = node.write_offset_begin();
 			ei = node.write_offset_end();
 			//sz = node.write_offset_sz();
@@ -370,6 +378,8 @@ namespace dsa {
 		https://github.com/llvm-mirror/poolalloc/blob/eb3a28cc226248240eb05273f543aca074979930/include/dsa/DataStructure.h#L218
 		*/
 		BU = &getAnalysis<BUDataStructures>();
+		// TD = &getAnalysis<TDDataStructures>();
+
 
 		std::error_code EC;
 
@@ -382,6 +392,7 @@ namespace dsa {
 
 		/*prints the analysis results - a function of BU's parent class - DataStructures in poolalloc*/
 		BU->print(F, &m);
+		// TD->print(F, &m);
 
 		// Despite its name, a NamedMDNode isn't itself an MDNode. NamedMDNodes belong to modules, have names, and contain lists of MDNodes.
 		if (NamedMDNode *CU_Nodes = m.getNamedMetadata("llvm.dbg.cu")) {
@@ -443,6 +454,7 @@ namespace dsa {
 				/*include/dsa/DSGraph.h +194	
 				The graph that represents a function.*/
 				DSGraph *graph = BU->getDSGraph(F);
+				// DSGraph *graph = TD->getDSGraph(F);
 				
 				/*include/dsa/DSNode.h +43
 				DSNode - Data structure node class
@@ -505,6 +517,7 @@ namespace dsa {
 		if(DICompileUnit* cu = dyn_cast<DICompileUnit>(nmd->getOperand(0))) {
 			DIGlobalVariableArray globalVariables = cu->getGlobalVariables();
 			DSGraph* graph = BU->getGlobalsGraph();
+			// DSGraph* graph = TD->getGlobalsGraph();
 			for(unsigned int i=0; i<globalVariables.size(); i++) {
 				//globalVariables[i]->dump();
 				//errs() << globalVariables[i]->getDisplayName().str() << "\n";
@@ -524,7 +537,9 @@ namespace dsa {
 				//file << "forward: " << node->isForwarding() << "\n";
 				std::vector<DSNode *> visitedNodes;
 				visitedNodes.push_back(node);
-				printOffsets(node, "", &file, &visitedNodes, of, var->getType(), globalVariables[i]->getDisplayName(), structName, "bu.global");
+				// printOffsets(node, "", &file, &visitedNodes, of, var->getType(), globalVariables[i]->getDisplayName(), structName, "bu.global");
+				// file << "\n";
+				printOffsets(node, "", &file, &visitedNodes, of, var->getType(), globalVariables[i]->getDisplayName(), structName, "td.global");
 				file << "\n";
 			}
 		}

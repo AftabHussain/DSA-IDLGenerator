@@ -15,6 +15,7 @@ namespace dsa {
 class DSAGenerator : public llvm::ModulePass {
 private:
   llvm::BUDataStructures *BU;
+  llvm::TDDataStructures *TD;
   std::string passName;
   std::string functionsList;
 
@@ -31,6 +32,8 @@ public:
   virtual void getAnalysisUsage(llvm::AnalysisUsage &AU) const {
     llvm::errs()<<"[dsagen.h] Adding required passes of dsaGenerator: BUDataStructures\n";
     AU.addRequired<llvm::BUDataStructures>();
+    llvm::errs()<<"[dsagen.h] Adding required passes of dsaGenerator: TDDataStructures\n";
+    AU.addRequired<llvm::TDDataStructures>();
     AU.setPreservesAll();
   }
 };
