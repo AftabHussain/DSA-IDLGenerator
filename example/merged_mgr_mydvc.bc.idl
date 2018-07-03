@@ -1,0 +1,93 @@
+
+projection <struct device_operations> fn_n.devops {
+
+Read: 
+
+Write: 
+ offset: 		char device_info
+}
+
+
+
+projection <struct device_operations> readAndWriteData.devops {
+
+Read: 
+ offset: 		int devop_init_registered
+
+Write: 
+ offset: 		char device_info
+}
+
+
+
+projection <struct packet> mydev_init.p {
+
+Read: 
+
+Write: 
+ offset: 		char p
+ offset: 		char data
+}
+
+
+
+projection <struct device_operations> mydev_uninit.devops {
+
+Read: 
+
+Write: 
+ offset: 		int devop_init_registered
+}
+
+
+
+projection <struct device_operations> readData.devops {
+
+Read: 
+ offset: 		int devop_init_registered
+
+Write: 
+}
+
+
+
+projection <struct device.0> reg_device.dev {
+
+Read: 
+
+Write: 
+ offset: 		float dev
+}
+
+
+
+projection <struct device_operations> foobar.devop {
+
+Read: 
+
+Write: 
+ offset: 		char device_info
+}
+
+
+
+
+projection <struct device_operations> reg_devops.devops {
+
+Read: 
+
+Write: 
+ offset: 		char device_info
+}
+
+
+
+projection <struct > bu.global.devops {
+
+Read: 
+
+Write: 
+ offset: 		char device_info
+}
+
+

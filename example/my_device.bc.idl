@@ -1,0 +1,57 @@
+
+projection <struct packet> mydev_init.p {
+
+Read: 
+
+Write: 
+ offsetT: 0		size
+ offset: 0
+ offsetT: 8		data
+ offset: 8
+}
+
+
+
+projection <struct device_operations> mydev_uninit.devops {
+
+Read: 
+
+Write: 
+ offsetT: 32		devop_init_registered
+ offset: 32
+}
+
+
+
+projection <struct device_operations> readAndWriteData.devops {
+
+Read: 
+ offsetT: 32		devop_init_registered
+ offset: 32
+
+Write: 
+ offsetT: 40		device_info
+ offset: 40
+}
+
+
+
+projection <struct device_operations> readData.devops {
+
+Read: 
+ offsetT: 32		devop_init_registered
+ offset: 32
+
+Write: 
+}
+
+
+
+projection <struct device_operations> bu.global.devops {
+
+Read: 
+
+Write: 
+}
+
+
