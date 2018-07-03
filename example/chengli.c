@@ -9,18 +9,24 @@ int Data;
 }list;
 
 void fun(int* X){
+    // write
     (*X)+=Global;
+    
+    // read 
+    // if((*X)>10){
+    //     printf("value less than 10");
+    // }
 }
 
- void accessF(struct list* L, void (*FP)(int*)){
-    //  do{
+ void accessF(struct list* L, void (*FP)(int*)){       
+         // should report r/w's reported by function pointed by 
+         //FP
          FP(&L->Data);
-        //  L=L->Next;
-    //  }while(L);
  }
 
  void passF(struct list* L){
-      accessF (L,fun);
+     // should report r/w's reported by function accessF
+     accessF (L,fun);
  }
 
 int main(){
