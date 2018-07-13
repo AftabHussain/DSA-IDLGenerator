@@ -29,20 +29,25 @@ namespace dsa {
 	DITypeIdentifierMap TypeIdentifierMap;
 	void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op, offsetNames &of, std::string, std::string);
 	void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off, std::string baseName, std::string indent, StringRef argName, std::string&);
+	std::string moduleName = "[dsa-gen]";
 
 	/// Prints it in console. Solely for debugging purposes
 	void dumpOffsetNames(offsetNames &of) {
-		errs() << "-------------------------------------------\n";
+		std::string printinfo = moduleName + "[dumpOffsetNames]: ";
+		// errs() << printinfo<<"Entered function\n";
 		for (auto off : of) {
-			errs() << "\toffset : " << off.first << "\t";
-			errs() << " | name : " << std::get<0>(off.second) << "\n";
+			errs() << printinfo<< "offset : " << off.first << "\n";
+			errs() << printinfo<< "name : " << std::get<0>(off.second) << "\n";
+		    if (std::get<0>(off.second)=="Block")errs()<<"END WATCH\n";
 		}
-		errs() << "-------------------------------------------\n";
 	}
 
 	void printOffsets(DSNode *node, std::string indentation, std::ofstream *file,
 			std::vector<DSNode *> *visitedNodes, offsetNames &of2, 
 			Type* elementType, StringRef elementName, std::string& structName, std::string functionName) {
+		
+		std::string printinfo = moduleName + "[printOffsets]: ";
+
 		if(structName != "") {
 			
 			//------UNEXAMINED (MAY BE USEFUL LATER)---------------//
@@ -113,8 +118,8 @@ namespace dsa {
 				//*file << "collapsed: " << (*ei).second.getNode()->isCollapsedNode() << "\n"; 
 				//*file << "forward: " << (*ei).second.getNode()->isForwarding() << "\n"; 
 			} catch (std::out_of_range &e) {
-				errs() << "OUT of range exception " << e.what() << "\n";
-                                errs() << "offset: " << offset << "\n";
+				errs() << printinfo<<"OUT of range exception " << e.what() << "\n";
+                                errs() <<printinfo<< "offset: " << offset << "\n";
 				continue;
 			}
 			
@@ -123,6 +128,7 @@ namespace dsa {
                         structName = "";
 			// Previous offset is zero. No continuation
 			getAllNames(Ty, ofInner, 0, offset_name, " ", elementName, structName);
+			errs() << printinfo<<"CALL dumpOffsetNames on line 130\n";
 			dumpOffsetNames(ofInner);
 			//assuming that we will have to print this projection only once
 			std::string emptyString("");
@@ -131,12 +137,14 @@ namespace dsa {
 	}
 
 	DIType* getLowestDINode(DIType* Ty) {
+
+		std::string printinfo = moduleName + "[getLowestDINode]: ";
 		if (Ty->getTag() == dwarf::DW_TAG_pointer_type ||
 				Ty->getTag() == dwarf::DW_TAG_member || Ty->getTag() == dwarf::DW_TAG_typedef) {
 			DIType *baseTy =
 				dyn_cast<DIDerivedType>(Ty)->getBaseType().resolve(TypeIdentifierMap);
 			if (!baseTy) {
-				errs() << "Type : NULL - Nothing more to do\n";
+				errs() <<printinfo<< "Type : NULL - Nothing more to do\n";
 				return NULL;
 			}
 
@@ -156,6 +164,8 @@ namespace dsa {
 	/*Recursive Fn called by getArgFieldNames*/
 	void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
 			std::string baseName, std::string indent, StringRef argName, std::string& structName) {
+
+		std::string printinfo = moduleName + "[getAllNames]: ";
 		//if(prev_off >= 1024) return;
 		// Handle Pointer type
 
@@ -176,7 +186,10 @@ namespace dsa {
 				std::string new_name(baseName);
                                 if (new_name != "") new_name.append(".");
 				new_name.append(der->getName().str());
-				errs()<<"type information: "<<der->getBaseType().resolve(TypeIdentifierMap);//->getTag()<<"\n"; 
+				errs()<< printinfo <<"type information:  "<<der->getBaseType().resolve(TypeIdentifierMap)->getTag()<<"\n"; 
+
+				errs()<< printinfo << "Updating [of] on line 192 with following pair:\n";
+				errs()<< printinfo << "first item [new_name] "<<new_name<<"\n";
 				of[offset + prev_off] = std::pair<std::string, DIType *>(
 						new_name, der->getBaseType().resolve(TypeIdentifierMap));
 				/// XXX: crude assumption that we want to peek only into those members
@@ -184,6 +197,7 @@ namespace dsa {
 				if (((der->getSizeInBits() >> 3) > 1) 
 						&& der->getBaseType().resolve(TypeIdentifierMap)->getTag()) {
 					std::string tempStructName("");
+					errs()<< printinfo <<"RECURSIVELY CALL getAllNames on 200\n";
 					getAllNames(dyn_cast<DIType>(der), of, prev_off + offset,
 							new_name, indent, argName, tempStructName);
 				}
@@ -193,8 +207,10 @@ namespace dsa {
 			structName = "";
 			//if type tag for the parameter is of pointer_type and DI type is DIBasicType 
 			//then treat it as a pointer of native type
-			of[0] = std::pair<std::string, DIType *>(
-					argName.str(), bas);
+			errs()<< printinfo << "Updating [of] on line 209 with following pair:\n";
+			errs()<< printinfo << "first item [argName.str()] "<<argName.str()<<"\n";
+			// of[0] = std::pair<std::string, DIType *>(argName.str(), bas);//This may be overwriting the correct name of the first member of the structure.
+			//TODO need to see whether this case (this else if situation) needs to be handled at all.
 		} else {
 			structName = "";
 		}
@@ -203,7 +219,10 @@ namespace dsa {
 	/*Called by runOnModule - Gets the field names of a structure*/
 	offsetNames getArgFieldNames(Function &F, unsigned argNumber, StringRef argName, std::string& structName) {
 
-		errs() << "F.getName(){"<<F.getName()<<"}\n";
+
+		std::string printinfo = moduleName + "[getArgFieldNames]: ";
+
+		// errs() << printinfo << "F.getName(){"<<F.getName()<<"}\n";
 		//errs() << "number of arguments";
 		offsetNames offNames;
 
@@ -212,25 +231,25 @@ namespace dsa {
 	
 		//didn't find any such case
 		if (argNumber > F.arg_size()) {
-			errs() << "### WARN : requested data for non-existent element\n";
+			errs() << printinfo << "### WARN : requested data for non-existent element\n";
 			return offNames;
 		}
-		errs() << "## Function ## : " << F.getName().str()
-		<< " | argsize: " << F.arg_size() << " :: Requested " << argNumber
-		<< "\n";
+		// errs() << moduleName << " getArgFieldNames - "<< "## Function ## : " << F.getName().str()
+		// << " | argsize: " << F.arg_size() << " :: Requested " << argNumber
+		// << "\n";
 		//Google smallvector llvm
 		SmallVector<std::pair<unsigned, MDNode *>, 4> MDs;
 		F.getAllMetadata(MDs);
 		for (auto &MD : MDs) {
 			if (MDNode *N = MD.second) {
-				errs()<<*N<<" value of the metadata\n";
+				// errs()<<*N<<" value of the metadata\n";
 				//http://llvm.org/docs/ProgrammersManual.html#the-isa-cast-and-dyn-cast-templates
 				//If the type of the metadata value can be casted to a DISubprogram
 				if (auto *subRoutine = dyn_cast<DISubprogram>(N)->getType()) {
 					
 					//XXX:if a function takes in no arguments, how can we assume it is of type void?
 					if (!subRoutine->getTypeArray()[0]) {
-						errs() << "return type \"void\" for Function : " << F.getName().str()<< "\n";
+						errs() << printinfo << "return type \"void\" for Function : " << F.getName().str()<< "\n";
 					}
 
 					const auto &TypeRef = subRoutine->getTypeArray();
@@ -242,7 +261,7 @@ namespace dsa {
 
 					//did not encounter this case with dummy.c
 					if (argNumber >= TypeRef.size()) {
-						errs() << "TypeArray request out of bounds. Are parameters coerced??\n";
+						errs() << printinfo << "TypeArray request out of bounds. Are parameters coerced??\n";
 						goto done;
 					}
 
@@ -250,6 +269,10 @@ namespace dsa {
 						// Resolve the type
 						DIType *Ty = ArgTypeRef.resolve(TypeIdentifierMap);
 						// Handle Pointer type
+						if (F.getName()=="passF")errs()<<"BEGIN WATCH\n";
+						errs() << printinfo <<"CALL getAllNames on line 266 with these params:\n";
+						errs() << printinfo << "argName = "<<argName<<"\n";
+						errs() << printinfo << "structName = "<<structName<<"\n";
 						getAllNames(Ty, offNames, 0, "", "  ", argName, structName);
 				}
 				}
@@ -261,6 +284,8 @@ namespace dsa {
 
 	/*Called by getTypeName*/	
 	std::string getTypeNameFromDINode(DIType* dt) {
+		std::string printinfo = moduleName + "[getTypeNameFromDINode]: ";
+
 		while(dt->getName().str() == "") {
 			dt = dyn_cast<DIDerivedType>(dt)->getBaseType().resolve(TypeIdentifierMap);
 		}
@@ -269,9 +294,13 @@ namespace dsa {
 
 	/*Recursive Function - first called by offsetPrinter*/
 	std::string getTypeName(DIType* dt, std::string function, std::string fieldName) {
-		errs()<<"check type name"<<dt->getName().str();
+		
+
+		std::string printinfo = moduleName + "[getTypeName]: ";
+
+		errs()<<printinfo<<"check type name\n"<<dt->getName().str();
 		if (DIBasicType* bt = dyn_cast<DIBasicType>(dt)) {
-			return bt->getName().str() + " " + fieldName;
+			return bt->getName().str() + " " + fieldName ;//fieldName returns the struct var name itself instead of its first field var.
 		} else if (DICompositeType* ct = dyn_cast<DICompositeType>(dt)) {
 			if (ct->getTag() == dwarf::DW_TAG_union_type) {
 				return "union " + fieldName;
@@ -325,6 +354,9 @@ namespace dsa {
 	/*Called by runOnModule*/
 	void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
 			offsetNames &of, std::string functionName, std::string indent) {
+		
+		std::string printinfo = moduleName + "[offsetPrinter]: ";
+		
 		DSNode::const_offset_iterator ii, ei;
 		//int sz, i=0;
 		if (op.str() == "read") {
@@ -341,8 +373,8 @@ namespace dsa {
 			//sz = node.write_offset_sz();
 		}
 		//errs() << "size: " << sz << "\n";
-		errs() << "checking ii ei"<< "\n";
-		errs() << *ii << " " << *ei << "\n" ;
+		// errs() << "checking ii ei"<< "\n";
+		// errs() << *ii << " " << *ei << "\n" ;
 		
 		for (; ii != ei; ii++) {
 			unsigned offset = *ii;
@@ -360,7 +392,7 @@ namespace dsa {
 			//when only printing *ii with net.bc, idl file (the file printing projections) only prints upto projection sock_sendpage.file, then only partially prints the constructs of the next projection.
 			//also no double free error was generated.
 			//More Development: the function getTypeName(of.at(offset).second, functionName, Name) generates the double free error, and also generates the garbage vaulues in the idl file for net.bc
-			file << indent << " offset: " << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
+			file << indent << " offset: " << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << " see this "<<of.at(offset).first<< "\n";//Name incorrectly holds the structure var name instead of structure member name //TODO: need to fix this
 		//	file << indent << " offset: " << "\t\t" ;
 		//	file << indent << " offset: " << *ii <<"\n";//<< "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
 			//file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
@@ -368,7 +400,8 @@ namespace dsa {
 	}
 
 	bool DSAGenerator::runOnModule(Module &m) {
-		errs()<<"[lib-dsagen] Running Pass DSAGenerator \n";
+		std::string printinfo = moduleName + "[runOnModule]: ";
+		errs()<<printinfo<<"Running Pass DSAGenerator \n";
 		/*include/dsaGenerator/DSAGenerator.h +17 //BU Definition //pointer to BUDataStructures
 		https://github.com/llvm-mirror/poolalloc/blob/master/include/dsa/DataStructure.h line 22
 		http://llvm.org/doxygen/classllvm_1_1Pass.html#a4863e5e463fb79955269fbf7fbf52b80
@@ -377,8 +410,8 @@ namespace dsa {
 		only performs a "Bottom Up" propagation (hence the name).
 		https://github.com/llvm-mirror/poolalloc/blob/eb3a28cc226248240eb05273f543aca074979930/include/dsa/DataStructure.h#L218
 		*/
-		BU = &getAnalysis<BUDataStructures>();
-		// TD = &getAnalysis<TDDataStructures>();
+		// BU = &getAnalysis<BUDataStructures>();
+		TD = &getAnalysis<TDDataStructures>();
 
 
 		std::error_code EC;
@@ -391,8 +424,8 @@ namespace dsa {
 
 
 		/*prints the analysis results - a function of BU's parent class - DataStructures in poolalloc*/
-		BU->print(F, &m);
-		// TD->print(F, &m);
+		// BU->print(F, &m);
+		TD->print(F, &m);
 
 		// Despite its name, a NamedMDNode isn't itself an MDNode. NamedMDNodes belong to modules, have names, and contain lists of MDNodes.
 		if (NamedMDNode *CU_Nodes = m.getNamedMetadata("llvm.dbg.cu")) {
@@ -418,7 +451,7 @@ namespace dsa {
 
 		// Unused Code	
 		std::string functionsListFile = getFunctionsList();
-		errs()<<"[lib-dsagen]getFunctionsList "<<getFunctionsList()<<" \n";
+		errs()<<printinfo<<"output of getFunctionsList(): "<<getFunctionsList()<<" \n";
 		//std::unordered_set<std::string> functions;
 		//functionsListFile is empty, the following is not invoked.
 		/*if(!functionsListFile.empty()) {
@@ -431,7 +464,7 @@ namespace dsa {
 		// scans through all caller callee functions.
 		for (auto &F : m) {
 
-			errs() << "Scanning Function {"<<F.getName().str()<<"}\n";
+			errs() <<printinfo<< "Scanning Function {"<<F.getName().str()<<"}\n";
 
 			//ignore functions like llvm.debug.declare
 			//http://en.cppreference.com/w/cpp/string/basic_string/npos	
@@ -440,12 +473,12 @@ namespace dsa {
 
 				//Return true if the primary definition of this global value is outside of the current translation unit.
 				if (F.isDeclaration()) {
-					errs() << "an undefined function{"<< F.getName().str()<<"}\n";
+					errs()<<printinfo << "an undefined function{"<< F.getName().str()<<"}\n";
 					undefinedFunctionsFile << F.getName().str() << "\n";
 					continue;
 				}
 				else {
-					errs() << "a defined function{"<< F.getName().str()<<"}\n";
+					errs()<<printinfo << "a defined function{"<< F.getName().str()<<"}\n";
 					definedFunctionsFile << F.getName().str() << "\n";
 				}
 
@@ -453,8 +486,8 @@ namespace dsa {
 				
 				/*include/dsa/DSGraph.h +194	
 				The graph that represents a function.*/
-				DSGraph *graph = BU->getDSGraph(F);
-				// DSGraph *graph = TD->getDSGraph(F);
+				// DSGraph *graph = BU->getDSGraph(F);
+				DSGraph *graph = TD->getDSGraph(F);
 				
 				/*include/dsa/DSNode.h +43
 				DSNode - Data structure node class
@@ -468,14 +501,14 @@ namespace dsa {
 				//include/llvm/ADT/iterator_range.h +32 | args is an iterator range
 				for (auto &arg : F.args()) {
 					//if (arg.getType()->isFPOrFPVectorTy()){errs()<<"got function type! arg "<<arg.getName().str()<<"\n";}
-					errs() << "Scanning argument {" << arg.getName().str() << "}\n";
+					errs()<<printinfo << "Scanning argument {" << arg.getName().str() << "}\n";
 					if (arg.hasName()) {
-						errs() << arg.getArgNo() << " = arg -->" << arg.getName().str() << "\n";
+						errs()<<printinfo << arg.getArgNo() << " = arg -->" << arg.getName().str() << "\n";
 					}
 
 					//did not find the following case to be true
 					else {
-						errs() << "arg does not have a name";
+						errs()<<printinfo << "arg does not have a name";
 					}
 
 					// XXX: What about non-pointer variables ??
@@ -490,12 +523,18 @@ namespace dsa {
   						current function, return the DSNode that it points to. */
 						DSNodeHandle &nodeHandle = graph->getNodeForValue(&arg);
 						DSNode *node = nodeHandle.getNode();
-						errs() << "isglobal: " << node->isGlobalNode() << "-------------------\n";
+						errs()<<printinfo << "is the node for this argument global?: " << node->isGlobalNode() << "-------------------\n";
 						if (node->isGlobalNode())
 							continue;
 						std::string structName;
-						errs() << "arg.getArgNo(){"<<arg.getArgNo()<<"}\n";
-						offsetNames of = getArgFieldNames(F, arg.getArgNo() + 1, arg.getName(), structName);
+						errs()<<printinfo << "arg.getArgNo(){"<<arg.getArgNo()<<"}\n";
+						errs() << printinfo<<"CALL getArgFieldNames on line 521 with these parameters:\n";
+						errs() << printinfo<<"F, s.t F.getName() = "<<F.getName()<<"\n";
+						errs() << printinfo<<"arg.getArgNo() + 1 = "<<arg.getArgNo() + 1<<"\n";
+						errs() << printinfo<<"arg.getName() = "<<arg.getName()<<"\n";
+						errs() << printinfo<<"structName = "<<structName<<"\n";
+						offsetNames of = getArgFieldNames(F, arg.getArgNo()+1, arg.getName(), structName);
+						errs() << printinfo<<"CALL dumpOffsetNames on line 523\n";
 						dumpOffsetNames(of);
 						//file << "collapsed: " << node->isCollapsedNode() << "\n";
 						//file << "forward: " << node->isForwarding() << "\n";
@@ -516,8 +555,8 @@ namespace dsa {
 		http://www.bogotobogo.com/cplusplus/dynamic_cast.php*/	
 		if(DICompileUnit* cu = dyn_cast<DICompileUnit>(nmd->getOperand(0))) {
 			DIGlobalVariableArray globalVariables = cu->getGlobalVariables();
-			DSGraph* graph = BU->getGlobalsGraph();
-			// DSGraph* graph = TD->getGlobalsGraph();
+			// DSGraph* graph = BU->getGlobalsGraph();
+			DSGraph* graph = TD->getGlobalsGraph();
 			for(unsigned int i=0; i<globalVariables.size(); i++) {
 				//globalVariables[i]->dump();
 				//errs() << globalVariables[i]->getDisplayName().str() << "\n";
@@ -528,11 +567,12 @@ namespace dsa {
 				offsetNames of;
 				getAllNames(diType, of, 0, "", "  ", globalVariables[i]->getDisplayName(), structName);
 				//offsetNames of = getArgFieldNames(F, arg.getArgNo() + 1, arg.getName(), structName);
+				errs() << printinfo<<"CALL dumpOffsetNames on line 554\n";
 				dumpOffsetNames(of);
 				DSNodeHandle &nodeHandle = graph->getNodeForValue(var);
 				DSNode *node = nodeHandle.getNode();
-				errs() << "name: " << globalVariables[i]->getDisplayName() << "-------------\n";
-				errs() << "is global: " << node->isGlobalNode() << "---------------\n";
+				errs() <<printinfo<< "name: " << globalVariables[i]->getDisplayName() << "\n";
+				errs() <<printinfo<< "is global: " << node->isGlobalNode() << "\n";
 				//file << "collapsed: " << node->isCollapsedNode() << "\n";
 				//file << "forward: " << node->isForwarding() << "\n";
 				std::vector<DSNode *> visitedNodes;
