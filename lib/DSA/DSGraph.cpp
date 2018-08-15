@@ -187,7 +187,7 @@ DSNode *DSGraph::addObjectToGraph(Value *Ptr, bool UseDeclaredType) {
 ///
 void DSGraph::cloneInto( DSGraph* G, unsigned CloneFlags) {
   assert(G != this && "Cannot clone graph into itself!");
-  errs() << "[dsgraph] cloneInto - Cloning DSGraph into current graph\n";
+  // errs() << "[dsgraph] cloneInto - Cloning DSGraph into current graph\n";
 
   NodeMapTy OldNodeMap;
 
@@ -266,7 +266,7 @@ void DSGraph::cloneInto( DSGraph* G, unsigned CloneFlags) {
 /// two seperate operations, do it as a single, much faster, one.
 ///
 void DSGraph::spliceFrom(DSGraph* RHS) {
-  errs() << "[dsgraph] spliceFrom - Cloning RHS graph into this graph\n";
+  // errs() << "[dsgraph] spliceFrom - Cloning RHS graph into this graph\n";
   assert(this != RHS && "Splicing self");
   // Change all of the nodes in RHS to think we are their parent.
   for (NodeListTy::iterator I = RHS->Nodes.begin(), E = RHS->Nodes.end();
@@ -296,7 +296,7 @@ void DSGraph::spliceFrom(DSGraph* RHS) {
 /// applicable) followed by all of the pointer-compatible arguments.
 void DSGraph::getFunctionArgumentsForCall(const Function *F,
                                        std::vector<DSNodeHandle> &Args) const {
-  errs() << "[dsgraph] getFunctionArgumentsForCall\n";
+  // errs() << "[dsgraph] getFunctionArgumentsForCall\n";
   Args.push_back(getReturnNodeFor(*F));
   Args.push_back(getVANodeFor(*F));
   for (Function::const_arg_iterator AI = F->arg_begin(), E = F->arg_end();
@@ -424,7 +424,7 @@ OutOfLoop:
 void DSGraph::mergeInGraph(const DSCallSite &CS,
                            std::vector<DSNodeHandle> &Args,
                            const DSGraph &Graph, unsigned CloneFlags) {
-  errs() << "[dsgraph] mergeInGraph-minimal\n";
+  // errs() << "[dsgraph] mergeInGraph-minimal\n";
   assert((CloneFlags & DontCloneCallNodes) &&
          "Doesn't support copying of call nodes!");
 
@@ -908,10 +908,10 @@ static void removeIdenticalCalls(DSGraph::FunctionListTy &Calls) {
   // Track the number of call nodes merged away...
   NumCallNodesMerged += NumDeleted;
 
-  if (NumDeleted)
-    // DEBUG(
-      errs() << "[dsgraph] Merged " << NumDeleted << " call nodes.\n";
-      // );
+  // if (NumDeleted)
+  //   // DEBUG(
+  //     errs() << "[dsgraph] Merged " << NumDeleted << " call nodes.\n";
+  //     // );
 }
 // removeTriviallyDeadNodes - After the graph has been constructed, this method
 // removes all unreachable nodes that are created because they got merged with
@@ -1507,7 +1507,7 @@ void DSGraph::updateFromGlobalGraph() {
 //
 bool
 llvm::functionIsCallable (ImmutableCallSite CS, const Function* F) {
-  errs() << "[dsgraph] functionIsCallable\n";
+  // errs() << "[dsgraph] functionIsCallable\n";
   //Which targets do we choose?
   //Conservative: all of them
   //Pretty Safe: same calling convention, otherwise undefined behavior
@@ -1599,7 +1599,7 @@ void DSGraph::buildCallGraph(DSCallGraph& DCG, std::vector<const Function*>& Glo
   //
   // Get the list of unresolved call sites.
   //
-  errs() << "[dsgraph] buildCallGraph - Getting list of unresolved call sites\n";
+  // errs() << "[dsgraph] buildCallGraph - Getting list of unresolved call sites\n";
   const FunctionListTy& Calls = getFunctionCalls();
   for (FunctionListTy::const_iterator ii = Calls.begin(),
       ee = Calls.end();
@@ -1657,7 +1657,7 @@ void DSGraph::buildCompleteCallGraph(DSCallGraph& DCG,
   //
   // Get the list of unresolved call sites.
   //
-  errs() << "[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites\n";
+  // errs() << "[dsgraph] buildCompleteCallGraph - Getting list of unresolved call sites\n";
   const FunctionListTy& Calls = getAuxFunctionCalls();
   for (FunctionListTy::const_iterator ii = Calls.begin(),
                                              ee = Calls.end();
