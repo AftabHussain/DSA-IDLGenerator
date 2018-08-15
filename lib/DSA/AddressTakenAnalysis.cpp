@@ -35,7 +35,7 @@ using namespace llvm;
 AddressTakenAnalysis::~AddressTakenAnalysis() {}
 
 static bool isAddressTaken(Value* V) {
-   errs()<<"[addresstaken] Checking "<<V->getName()<<"\n";
+  //  errs()<<"[addresstaken] Checking "<<V->getName()<<"\n";
   for (Value::const_use_iterator I = V->use_begin(), E = V->use_end(); I != E; ++I) {
     User *U = I->getUser();
     if(isa<StoreInst>(U))
