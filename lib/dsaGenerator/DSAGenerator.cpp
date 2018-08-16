@@ -27,9 +27,10 @@ namespace dsa {
 
 	typedef std::map<unsigned, std::pair<std::string, DIType *>> offsetNames;
 	DITypeIdentifierMap TypeIdentifierMap;
-	void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op, offsetNames &of, std::string, std::string);
+	void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op, offsetNames &of, std::string, std::string, Type* argType);
 	void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off, std::string baseName, std::string indent, StringRef argName, std::string&);
 	std::string moduleName = "[dsa-gen]";
+	std::ofstream func_info("fn.info");
 
 	/// Prints it in console. Solely for debugging purposes
 	void dumpOffsetNames(offsetNames &of) {
@@ -47,7 +48,8 @@ namespace dsa {
 			Type* elementType, StringRef elementName, std::string& structName, std::string functionName) {
 		
 		std::string printinfo = moduleName + "[printOffsets]: ";
-
+		errs()<<printinfo<<"Function being processed [functionName]: "<<functionName<<"\n";
+		errs()<<printinfo<<"[structName]: "<<structName<<"\n";
 		if(structName != "") {
 			
 			//------UNEXAMINED (MAY BE USEFUL LATER)---------------//
@@ -69,10 +71,12 @@ namespace dsa {
 			There are two different kinds of struct types: Literal structs and Identified structs.
 			http://llvm.org/doxygen/classllvm_1_1StructType.html#details*/
 
+			// errs()<<printinfo<<"Enter 76";
 			while(!isa<StructType>(argType)) {
 				argType = dyn_cast<PointerType>(argType)->getElementType();
 			//*file << indentation << "\nargument " << dyn_cast<PointerType>(argType)<< "> " <<" {\n";
 			}
+			// errs()<<printinfo<<"crossed 76!";
 
 			/*substr(7) because names begins with "struct." --- 7 characters
 			projection <struct structure_name> function_name.argument name*/	
@@ -81,11 +85,13 @@ namespace dsa {
 			//Condensed idl
 			*file << "Function: " << functionName <<"\n";
 			*file << "Projects structure: " << dyn_cast<StructType>(argType)->getName().substr(7).str()  <<"\n";
+
+			// *func_info << functionName <<
 			// *file << indentation << "\nprojection <struct " << dyn_cast<StructType>(argType)->getName().substr(7).str() << "> " << functionName << "." << elementName.str() << " {\n";
                         
 			//*file << (node->isCollapsedNode() ? "collapsed\n" : "not collapsed\n");
-			offsetPrinter(*node, *file, "read", of2, functionName, indentation);
-			offsetPrinter(*node, *file, "write", of2, functionName, indentation);
+			offsetPrinter(*node, *file, "read", of2, functionName, indentation, argType);
+			offsetPrinter(*node, *file, "write", of2, functionName, indentation, argType);
 			*file << "\n\n";
 			// *file << indentation << "}\n\n";
 		} 
@@ -132,6 +138,7 @@ namespace dsa {
 			dumpOffsetNames(ofInner);
 			//assuming that we will have to print this projection only once
 			std::string emptyString("");
+			errs()<<printinfo<<"CALL printOffsets on line 138\n";
 			printOffsets((*ei).second.getNode(), ind2, file, visitedNodes, ofInner, elementType, elementName, emptyString, emptyString);
 		}
 	}
@@ -141,6 +148,7 @@ namespace dsa {
 		std::string printinfo = moduleName + "[getLowestDINode]: ";
 		if (Ty->getTag() == dwarf::DW_TAG_pointer_type ||
 				Ty->getTag() == dwarf::DW_TAG_member || Ty->getTag() == dwarf::DW_TAG_typedef) {
+					errs() <<printinfo<< "TAG is either dwarf::DW_TAG_pointer_type ||dwarf::DW_TAG_member || dwarf::DW_TAG_typedef\n";
 			DIType *baseTy =
 				dyn_cast<DIDerivedType>(Ty)->getBaseType().resolve(TypeIdentifierMap);
 			if (!baseTy) {
@@ -166,6 +174,8 @@ namespace dsa {
 			std::string baseName, std::string indent, StringRef argName, std::string& structName) {
 
 		std::string printinfo = moduleName + "[getAllNames]: ";
+		errs()<< printinfo << "argName: " << argName << "\n";
+		errs()<< printinfo << "Ty->getRawName(): " << Ty->getRawName() << "\n";
 		//if(prev_off >= 1024) return;
 		// Handle Pointer type
 
@@ -293,8 +303,7 @@ namespace dsa {
 	}
 
 	/*Recursive Function - first called by offsetPrinter*/
-	std::string getTypeName(DIType* dt, std::string function, std::string fieldName) {
-		
+	std::string getTypeName(DIType* dt, std::string function, std::string fieldName) {		
 
 		std::string printinfo = moduleName + "[getTypeName]: ";
 
@@ -353,7 +362,7 @@ namespace dsa {
 
 	/*Called by runOnModule*/
 	void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op,
-			offsetNames &of, std::string functionName, std::string indent) {
+			offsetNames &of, std::string functionName, std::string indent, Type* argType) {
 		
 		std::string printinfo = moduleName + "[offsetPrinter]: ";
 		
@@ -362,6 +371,7 @@ namespace dsa {
 		if (op.str() == "read") {
 			file <<  "Read: \n";
 			// file << "\n" << indent << "Read: \n";
+			
 			ii = node.read_offset_begin();
 			ei = node.read_offset_end();
 			//sz = node.read_offset_sz();
@@ -392,7 +402,8 @@ namespace dsa {
 			//when only printing *ii with net.bc, idl file (the file printing projections) only prints upto projection sock_sendpage.file, then only partially prints the constructs of the next projection.
 			//also no double free error was generated.
 			//More Development: the function getTypeName(of.at(offset).second, functionName, Name) generates the double free error, and also generates the garbage vaulues in the idl file for net.bc
-			file << indent << " offset: " << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << " see this "<<of.at(offset).first<< "\n";//Name incorrectly holds the structure var name instead of structure member name //TODO: need to fix this
+			func_info << functionName <<"\t"<<dyn_cast<StructType>(argType)->getName().substr(7).str()  <<"\t"<<getTypeName(of.at(offset).second, functionName, Name) <<"\t"<< op.str()<<"\n";
+			file << indent << " offset: " << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";//Name incorrectly holds the structure var name instead of structure member name //TODO: need to fix this
 		//	file << indent << " offset: " << "\t\t" ;
 		//	file << indent << " offset: " << *ii <<"\n";//<< "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
 			//file << indent << " offset: " << *ii << "\t\t" << getTypeName(of.at(offset).second, functionName, Name) << "\n";
@@ -410,8 +421,12 @@ namespace dsa {
 		only performs a "Bottom Up" propagation (hence the name).
 		https://github.com/llvm-mirror/poolalloc/blob/eb3a28cc226248240eb05273f543aca074979930/include/dsa/DataStructure.h#L218
 		*/
-		// BU = &getAnalysis<BUDataStructures>();
+	    if (ANALYSIS_MODE=="BU_ONLY"){
+		BU = &getAnalysis<BUDataStructures>();
+		}
+		else if (ANALYSIS_MODE=="FULL"){ 
 		TD = &getAnalysis<TDDataStructures>();
+		}
 
 
 		std::error_code EC;
@@ -422,10 +437,15 @@ namespace dsa {
 		*/
 		llvm::raw_fd_ostream F("bu", EC, sys::fs::OpenFlags::F_None);
 
+		//DO this if you don't want to generate IDL
+		// return 0;
 
 		/*prints the analysis results - a function of BU's parent class - DataStructures in poolalloc*/
+		// if (ANALYSIS_MODE=="BU_ONLY")
 		// BU->print(F, &m);
-		TD->print(F, &m);
+		// else if (ANALYSIS_MODE=="FULL")
+		// TD->print(F, &m);
+
 
 		// Despite its name, a NamedMDNode isn't itself an MDNode. NamedMDNodes belong to modules, have names, and contain lists of MDNodes.
 		if (NamedMDNode *CU_Nodes = m.getNamedMetadata("llvm.dbg.cu")) {
@@ -486,8 +506,11 @@ namespace dsa {
 				
 				/*include/dsa/DSGraph.h +194	
 				The graph that represents a function.*/
-				// DSGraph *graph = BU->getDSGraph(F);
-				DSGraph *graph = TD->getDSGraph(F);
+				DSGraph *graph;
+				if (ANALYSIS_MODE=="BU_ONLY")
+				graph = BU->getDSGraph(F);
+				else if (ANALYSIS_MODE=="FULL")
+				graph = TD->getDSGraph(F);
 				
 				/*include/dsa/DSNode.h +43
 				DSNode - Data structure node class
@@ -541,6 +564,10 @@ namespace dsa {
 						std::vector<DSNode *> visitedNodes;
 
 						visitedNodes.push_back(node);
+						errs()<<printinfo<<"CALL printOffsets on line 555 with following params:\n";
+						errs()<<printinfo<<"arg.getName(): "<<arg.getName()<<"\n";
+						errs()<<printinfo<<"structName : "<<structName<<"\n";
+						errs()<<printinfo<<"F.getName() : "<<F.getName()<<"\n";
 						printOffsets(node, "", &file, &visitedNodes, of, arg.getType(), arg.getName(), structName, F.getName().str());
 					}
 					file << "\n";
@@ -555,8 +582,11 @@ namespace dsa {
 		http://www.bogotobogo.com/cplusplus/dynamic_cast.php*/	
 		if(DICompileUnit* cu = dyn_cast<DICompileUnit>(nmd->getOperand(0))) {
 			DIGlobalVariableArray globalVariables = cu->getGlobalVariables();
-			// DSGraph* graph = BU->getGlobalsGraph();
-			DSGraph* graph = TD->getGlobalsGraph();
+			DSGraph* graph;
+			if (ANALYSIS_MODE=="BU_ONLY")
+			graph = BU->getGlobalsGraph();
+			else if (ANALYSIS_MODE=="FULL")
+			graph = TD->getGlobalsGraph();
 			for(unsigned int i=0; i<globalVariables.size(); i++) {
 				//globalVariables[i]->dump();
 				//errs() << globalVariables[i]->getDisplayName().str() << "\n";
@@ -579,6 +609,7 @@ namespace dsa {
 				visitedNodes.push_back(node);
 				// printOffsets(node, "", &file, &visitedNodes, of, var->getType(), globalVariables[i]->getDisplayName(), structName, "bu.global");
 				// file << "\n";
+				errs()<<printinfo<<"CALL printOffsets on line 596\n";
 				printOffsets(node, "", &file, &visitedNodes, of, var->getType(), globalVariables[i]->getDisplayName(), structName, "td.global");
 				file << "\n";
 			}

@@ -28,12 +28,17 @@ public:
   std::string getFunctionsList() {return functionsList;}
 
   virtual bool runOnModule(llvm::Module &m);
+  std::string ANALYSIS_MODE = "FULL";//BU_ONLY or FULL
 
   virtual void getAnalysisUsage(llvm::AnalysisUsage &AU) const {
+    if (ANALYSIS_MODE=="BU_ONLY"){
     // llvm::errs()<<"[dsagen.h] Adding required passes of dsaGenerator: BUDataStructures\n";
-    // AU.addRequired<llvm::BUDataStructures>();
-    llvm::errs()<<"[dsagen.h] Adding required passes of dsaGenerator: TDDataStructures\n";
+    AU.addRequired<llvm::BUDataStructures>();
+    }
+    else if (ANALYSIS_MODE=="FULL"){
+    // llvm::errs()<<"[dsagen.h] Adding required passes of dsaGenerator: TDDataStructures\n";
     AU.addRequired<llvm::TDDataStructures>();
+    }
     AU.setPreservesAll();
   }
 };
