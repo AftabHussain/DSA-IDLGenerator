@@ -28,13 +28,13 @@ void init(struct node* head) {
     head = NULL;
 }
 
-void register_device(struct device* device_option)
+void register_device(struct device* dev)
 {
     /* allocate node */
     struct node* new_node = (struct node*) malloc(sizeof(struct node));
  
     /* put in the key  */
-    new_node->dev  = device_option;
+    new_node->dev  = dev;
  
     /* link the old list off the new node */
     new_node->next = device_list_head;
@@ -83,7 +83,7 @@ static void dev2_open(struct device *dev){
 
 static struct device dev2 = {
         .name   = "device_2",
-        .open   = dev1_open,
+        .open   = dev2_open,
 };
 /***********************************/
 
