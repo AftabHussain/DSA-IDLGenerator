@@ -23,9 +23,14 @@
 #include "llvm/Support/FormattedStream.h"
 #include "llvm/Support/Timer.h"
 #include "llvm/ADT/Statistic.h"
+#include <fstream>
+#include <string.h>
 using namespace llvm;
 
 #define TIME_REGION(VARNAME, DESC)
+
+std::ofstream tdEdges("graph.td.edges");
+std::string src, tgt;
 
 namespace {
   RegisterPass<TDDataStructures>   // Register the pass
@@ -74,9 +79,9 @@ void TDDataStructures::markReachableFunctionsExternallyAccessible(DSNode *N,
 //
 bool TDDataStructures::runOnModule(Module &M) {
 
-  errs() << "[TD] runOnModule | useEQBE val "<<useEQBU<<" \n";
+  // errs() << "[TD] runOnModule | useEQBE val "<<useEQBU<<" \n";
   
-  errs() << "[TD] runOnModule | getting analysis of BU for TD \n";
+  // errs() << "[TD] runOnModule | getting analysis of BU for TD \n";
   init(useEQBU ? &getAnalysis<EquivBUDataStructures>()
        : &getAnalysis<BUDataStructures>(),
        true, true, true, false);
@@ -251,8 +256,8 @@ void TDDataStructures::InlineCallersIntoGraph(DSGraph* DSG) {
                         DSGraph::DontCloneAuxCallNodes);
 
   // DEBUG(
-    errs() << "[TD] Inlining callers into '"
-        << DSG->getFunctionNames() << "'\n";
+    // errs() << "[TD] Inlining callers into '"
+    //     << DSG->getFunctionNames() << "'\n";
         // );
 
   DSG->maskIncompleteMarkers();
@@ -271,24 +276,30 @@ void TDDataStructures::InlineCallersIntoGraph(DSGraph* DSG) {
       const DSCallSite &CS = *EdgesFromCaller.back().CS;
       const Function &CF = *EdgesFromCaller.back().CalledFunction;
       // DEBUG(
-        errs() << "   [TD] Inlining graph into Fn '"
-            << CF.getName().str() << "' from ";
+        // errs() << "   [TD] Inlining graph into Fn '"
+        //     << CF.getName().str() << "' from ";
+            tgt="";
+            tgt=CF.getName().str();
             // );
       if (CallerGraph->getReturnNodes().empty()) {
         // DEBUG(
-          errs() << "[TD] SYNTHESIZED INDIRECT GRAPH";
+          // errs() << "[TD] SYNTHESIZED INDIRECT GRAPH";
           // );
       } else {
         // DEBUG(
-          errs() << "[TD] Fn '" << CS.getCallSite().getInstruction()->
-              getParent()->getParent()->getName().str() << "'";
+          // errs() << "[TD] Fn '" << CS.getCallSite().getInstruction()->
+          //     getParent()->getParent()->getName().str() << "'";
+              src="";
+              src=CS.getCallSite().getInstruction()->
+              getParent()->getParent()->getName().str();
               // );
       }
       //DEBUG(
-        errs() << "[TD] : " << CF.getFunctionType()->getNumParams()
-            << " args\n";
+        // errs() << "[TD] : " << CF.getFunctionType()->getNumParams()
+        //     << " args\n";
             //);
 
+      tdEdges << src + "\t" + tgt + "\n";
       // Get the formal argument and return nodes for the called function and
       // merge them with the cloned subgraph.
       DSCallSite T1 = DSG->getCallSiteForArguments(CF);
@@ -400,9 +411,9 @@ void TDDataStructures::InlineCallersIntoGraph(DSGraph* DSG) {
 
     // If we already have this graph, recycle it.
     if (IndCallRecI != IndCallMap.end() && IndCallRecI->first == Callees) {
-      // DEBUG(
-        errs() << "  [TD] *** Reuse of indcall graph for " << Callees.size()
-            << " callees!\n";
+      // // DEBUG(
+      //   errs() << "  [TD] *** Reuse of indcall graph for " << Callees.size()
+      //       << " callees!\n";
             // );
       DSGraph * IndCallGraph = IndCallRecI->second;
       assert(IndCallGraph->getFunctionCalls().size() == 1);

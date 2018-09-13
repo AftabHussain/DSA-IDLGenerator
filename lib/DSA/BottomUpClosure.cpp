@@ -22,8 +22,11 @@
 #include "llvm/ADT/Statistic.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/FormattedStream.h"
+#include <fstream>
+#include <string.h>
 
 using namespace llvm;
+std::ofstream buEdges("graph.bu.edges");
 
 namespace {
   STATISTIC (MaxSCC, "Maximum SCC Size in Call Graph");
@@ -370,6 +373,10 @@ BUDataStructures::calculateGraphs (const Function *F,
                                    TarjanStack & Stack,
                                    unsigned & NextID,
                                    TarjanMap & ValMap) {
+
+  //IF YOU WANT TO DO LOCAL ONLY, WE ESSENTIALLY AVOID DOING THE INLINING IN BOTTOMUP
+    // return 0;//advisable not to do this 
+
   assert(!ValMap.count(F) && "Shouldn't revisit functions!");
   unsigned Min = NextID++, MyID = Min;
   ValMap[F] = Min;
@@ -694,19 +701,25 @@ void BUDataStructures::calculateGraph(DSGraph* Graph) {
 
     DSGraph *GI;
 
+    
+
     for (FuncSet::iterator I = CalledFuncs.begin(), E = CalledFuncs.end();
          I != E; ++I) {
       const Function *Callee = *I;
       // Get the data structure graph for the called function.
-
+     
       GI = getDSGraph(*Callee);  // Graph to inline
       DEBUG(GI->AssertGraphOK(); GI->getGlobalsGraph()->AssertGraphOK());
       // DEBUG(
-        errs() << "[bottomupclosure]    Inlining graph for " << Callee->getName()
+      errs() << "[bottomupclosure]    Inlining graph for " << Callee->getName()
 	    << "[" << GI->getGraphSize() << "+"
 	    << GI->getAuxFunctionCalls().size() << "] into '"
 	    << Graph->getFunctionNames() << "' [" << Graph->getGraphSize() <<"+"
 	    << Graph->getAuxFunctionCalls().size() << "]\n";
+
+
+      buEdges << Graph->getFunctionNames() +"\t"+ Callee->getName().str() <<"\n";
+// Callee->getName()->getString() + "\t" +
       // );
 
       //
