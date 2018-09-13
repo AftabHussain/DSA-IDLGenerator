@@ -28,7 +28,7 @@ namespace dsa {
 	typedef std::map<unsigned, std::pair<std::string, DIType *>> offsetNames;
 	DITypeIdentifierMap TypeIdentifierMap;
 	void offsetPrinter(const DSNode &node, std::ofstream &file, StringRef op, offsetNames &of, std::string, std::string, Type* argType);
-	void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off, std::string baseName, std::string indent, StringRef argName, std::string&);
+	void getAllNames(DIType *Ty, std::set<std::string> seen_names, offsetNames &of, unsigned prev_off, std::string baseName, std::string indent, StringRef argName, std::string&);
 	std::string moduleName = "[dsa-gen]";
 	std::ofstream func_info("fn.info");
 
@@ -133,7 +133,9 @@ namespace dsa {
 			//errs() << Ty->getTag() << "\n";
                         structName = "";
 			// Previous offset is zero. No continuation
-			getAllNames(Ty, ofInner, 0, offset_name, " ", elementName, structName);
+			std::set<std::string> seen_names;
+			getAllNames(Ty, seen_names, ofInner, 0, offset_name, " ", elementName, structName);
+			seen_names.clear();
 			errs() << printinfo<<"CALL dumpOffsetNames on line 130\n";
 			dumpOffsetNames(ofInner);
 			//assuming that we will have to print this projection only once
@@ -170,7 +172,7 @@ namespace dsa {
 	}
 
 	/*Recursive Fn called by getArgFieldNames*/
-	void getAllNames(DIType *Ty, offsetNames &of, unsigned prev_off,
+	void getAllNames(DIType *Ty, std::set<std::string> seen_names, offsetNames &of, unsigned prev_off,
 			std::string baseName, std::string indent, StringRef argName, std::string& structName) {
 
 		std::string printinfo = moduleName + "[getAllNames]: ";
@@ -189,10 +191,21 @@ namespace dsa {
 			structName = baseTy->getName().str();
 			DICompositeType *compType = dyn_cast<DICompositeType>(baseTy);
 
+			/********from Yongzhe's PtrSplit - DSAGenerator Code**********/
 			// Go thro struct elements and print them all
 			for (DINode *Op : compType->getElements()) {
 				DIDerivedType *der = dyn_cast<DIDerivedType>(Op);
 				unsigned offset = der->getOffsetInBits() >> 3;
+
+				          // do some type checking. If recursive type call, return
+            std::string curStructName = der->getName().str();
+            if (seen_names.find(curStructName) != seen_names.end()) {
+                errs() << "Find repeat struct name. Break Here!"  << "\n";
+                continue;
+            }
+            seen_names.insert(curStructName);
+			/******************/
+
 				std::string new_name(baseName);
                                 if (new_name != "") new_name.append(".");
 				new_name.append(der->getName().str());
@@ -208,7 +221,7 @@ namespace dsa {
 						&& der->getBaseType().resolve(TypeIdentifierMap)->getTag()) {
 					std::string tempStructName("");
 					errs()<< printinfo <<"RECURSIVELY CALL getAllNames on 200\n";
-					getAllNames(dyn_cast<DIType>(der), of, prev_off + offset,
+					getAllNames(dyn_cast<DIType>(der), seen_names, of, prev_off + offset,
 							new_name, indent, argName, tempStructName);
 				}
 				//errs() << "--------------- " << der->getName().str() << "\n";
@@ -283,7 +296,9 @@ namespace dsa {
 						errs() << printinfo <<"CALL getAllNames on line 266 with these params:\n";
 						errs() << printinfo << "argName = "<<argName<<"\n";
 						errs() << printinfo << "structName = "<<structName<<"\n";
-						getAllNames(Ty, offNames, 0, "", "  ", argName, structName);
+						std::set<std::string> seen_names;
+						getAllNames(Ty, seen_names, offNames, 0, "", "  ", argName, structName);
+						seen_names.clear();
 				}
 				}
 			}
@@ -595,7 +610,9 @@ namespace dsa {
 				DIType* diType = globalVariables[i]->getType().resolve(TypeIdentifierMap);
 				std::string structName;
 				offsetNames of;
-				getAllNames(diType, of, 0, "", "  ", globalVariables[i]->getDisplayName(), structName);
+				std::set<std::string> seen_names;
+				getAllNames(diType, seen_names, of, 0, "", "  ", globalVariables[i]->getDisplayName(), structName);
+				seen_names.clear();
 				//offsetNames of = getArgFieldNames(F, arg.getArgNo() + 1, arg.getName(), structName);
 				errs() << printinfo<<"CALL dumpOffsetNames on line 554\n";
 				dumpOffsetNames(of);
